@@ -1,5 +1,6 @@
 // CORS proxy worker for Syr's M+ Helper
 // Forwards API requests to bypass CORS restrictions
+// Uses Raider.IO API key for authenticated access
 addEventListener('fetch', event => {
   event.respondWith(handle(event.request));
 });
