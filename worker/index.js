@@ -41,10 +41,20 @@ async function handle(request) {
     if (!target) return new Response('Missing url query param', { status: 400 });
 
     // Add RaiderIO API key as query parameter for authenticated access
-    if (typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY) {
+    const hasKey = typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY;
+    if (hasKey) {
       const targetUrl = new URL(target);
       targetUrl.searchParams.set('access_token', RAIDERIO_API_KEY);
       target = targetUrl.toString();
+    } else {
+      // If no API key, return error to help with debugging
+      return new Response(JSON.stringify({error: 'API key not configured in worker'}), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
     }
 
     // Fetch with standard headers
