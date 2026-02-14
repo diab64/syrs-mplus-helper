@@ -356,15 +356,19 @@ function getAffixesForLevel(kl, weekly) {
 
 // Fetch with CORS proxy fallback for Raider.io API
 async function fetchWithCorsFallback(url, opts) {
-  // For raider.io URLs, skip direct fetch and use proxy immediately
-  // (direct fetch returns 200 but browser blocks response due to CORS)
-  const needsProxy = url.includes('raider.io');
+  // Check if we're running locally (localhost or 127.0.0.1)
+  const isLocal = window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.protocol === 'file:';
 
-  if (!needsProxy) {
+  // If local, try direct fetch first (no CORS restrictions on localhost)
+  if (isLocal) {
     try {
       const r = await fetch(url, opts);
       if (r.ok) return r;
-    } catch (e) {}
+    } catch (e) {
+      console.log('Direct fetch failed locally, trying proxies:', e);
+    }
   }
 
   // Try Vercel serverless function proxy (our own backend)
