@@ -554,7 +554,7 @@ function DungeonRunRow({ run, index }) {
   return (
     <div className="dungeon-row fade-in" style={{ animationDelay: `${index*0.04}s` }}>
       <img className="dungeon-thumb" src={run.icon} alt={run.dungeon}
-        onError={e => { e.target.src = `https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(run.short||'?')}`; }} />
+        onError={e => { if (!e.target.dataset.errored) { e.target.dataset.errored = 'true'; e.target.src = `https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(run.short||'?')}`; } }} />
       <div className="dungeon-info">
         <div className="dungeon-name">{run.dungeon} <span className="key-level-badge">+{run.keyLevel}</span></div>
         <div className="dungeon-meta">
@@ -880,7 +880,7 @@ function App() {
                 {Object.values(dungeonState).map((d,i)=>(
                   <div key={d.slug} className="dungeon-row fade-in" style={{animationDelay:`${i*0.03}s`}}>
                     <img className="dungeon-thumb" src={d.icon} alt={d.name}
-                      onError={e=>{e.target.src=`https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(d.short)}`;}} />
+                      onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(d.short)}`;}}}/>
                     <div className="dungeon-info">
                       <div className="dungeon-name">{d.name}</div>
                       <div className="dungeon-meta">
