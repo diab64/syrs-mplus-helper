@@ -1,3 +1,6 @@
 name = "syrs-mplus-helper-proxy"
 main = "index.js"
 compatibility_date = "2026-02-13"
+
+[vars]
+# RAIDERIO_API_KEY will be set via GitHub Actions environment
