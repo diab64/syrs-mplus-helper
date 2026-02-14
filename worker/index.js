@@ -20,9 +20,10 @@ async function handle(request) {
 
   try {
     const url = new URL(request.url);
+    let target = url.searchParams.get('url');
 
     // Debug endpoint to check if API key is set
-    if (url.pathname === '/debug') {
+    if (target === 'debug') {
       const hasKey = typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY;
       const keyPreview = hasKey ? RAIDERIO_API_KEY.substring(0, 8) + '...' : 'NOT SET';
       return new Response(JSON.stringify({
@@ -37,7 +38,6 @@ async function handle(request) {
       });
     }
 
-    let target = url.searchParams.get('url');
     if (!target) return new Response('Missing url query param', { status: 400 });
 
     // Add RaiderIO API key as query parameter for authenticated access
