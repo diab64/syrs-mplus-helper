@@ -354,20 +354,25 @@ function getAffixesForLevel(kl, weekly) {
   return a;
 }
 
-// Try a direct fetch first; on network/CORS failure, retry via a public CORS proxy.
+// Try a direct fetch first; on network/CORS failure, retry via CORS proxy.
 async function fetchWithCorsFallback(url, opts) {
   try {
     const r = await fetch(url, opts);
     if (r.ok) return r;
   } catch (e) {}
-  // First try a local proxy (if you run proxy-server.js) to avoid relying on
-  // public proxies which may be unreliable. If not available, fall back to
-  // public proxies.
+  // Try Cloudflare Worker proxy (deployed for this app)
+  try {
+    const cfWorker = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev/proxy?url=' + encodeURIComponent(url);
+    const rCF = await fetch(cfWorker, opts);
+    if (rCF && rCF.ok) return rCF;
+  } catch (e) {}
+  // Try local proxy (for development with proxy-server.js)
   try {
     const local = 'http://127.0.0.1:3000/proxy?url=' + encodeURIComponent(url);
     const rLocal = await fetch(local, opts);
     if (rLocal && rLocal.ok) return rLocal;
   } catch (e) {}
+  // Fallback to public proxies (may be unreliable)
   try {
     const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const r2 = await fetch(proxy, opts);
