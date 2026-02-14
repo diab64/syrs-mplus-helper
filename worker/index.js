@@ -1,4 +1,5 @@
 // CORS proxy worker for Syr's M+ Helper
+// Forwards API requests to bypass CORS restrictions
 addEventListener('fetch', event => {
   event.respondWith(handle(event.request));
 });
