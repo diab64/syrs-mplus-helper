@@ -5,29 +5,51 @@ addEventListener('fetch', event => {
 });
 
 async function handle(request) {
+  // Handle CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Max-Age': '86400'
+      }
+    });
+  }
+
   try {
     const url = new URL(request.url);
     const target = url.searchParams.get('url');
     if (!target) return new Response('Missing url query param', { status: 400 });
 
-    // Send proper headers to avoid being blocked
-    const upstream = await fetch(target, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://diab64.github.io/'
-      }
-    });
+    // Try fetching with minimal headers (Raider.io might block obvious proxies)
+    const upstream = await fetch(target);
+    const text = await upstream.text();
 
-    const body = await upstream.arrayBuffer();
+    // Check if we got HTML instead of JSON (blocked)
+    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+      return new Response(JSON.stringify({error: 'API returned HTML instead of JSON - likely blocked'}), {
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     const headers = new Headers(upstream.headers);
-    // Ensure CORS is allowed for browser requests
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'Content-Type');
-    return new Response(body, { status: upstream.status, headers });
+
+    return new Response(text, { status: upstream.status, headers });
   } catch (err) {
-    return new Response('Proxy error', { status: 502 });
+    return new Response(JSON.stringify({error: 'Proxy error', message: err.message}), {
+      status: 502,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
   }
 }
