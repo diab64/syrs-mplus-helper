@@ -20,6 +20,23 @@ async function handle(request) {
 
   try {
     const url = new URL(request.url);
+
+    // Debug endpoint to check if API key is set
+    if (url.pathname === '/debug') {
+      const hasKey = typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY;
+      const keyPreview = hasKey ? RAIDERIO_API_KEY.substring(0, 8) + '...' : 'NOT SET';
+      return new Response(JSON.stringify({
+        apiKeySet: hasKey,
+        keyPreview: keyPreview,
+        keyLength: hasKey ? RAIDERIO_API_KEY.length : 0
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     let target = url.searchParams.get('url');
     if (!target) return new Response('Missing url query param', { status: 400 });
 
