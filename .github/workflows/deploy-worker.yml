@@ -24,6 +24,7 @@ jobs:
           RAIDERIO_API_KEY: ${{ secrets.RAIDERIO_API_KEY }}
         run: |
           cd worker
+          npx wrangler secret delete RAIDERIO_API_KEY || true
           echo "$RAIDERIO_API_KEY" | npx wrangler secret put RAIDERIO_API_KEY
       - name: Deploy worker
         env:
