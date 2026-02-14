@@ -367,19 +367,7 @@ async function fetchWithCorsFallback(url, opts) {
     } catch (e) {}
   }
 
-  // Try Cloudflare Worker proxy (deployed for this app)
-  try {
-    const cfWorker = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev/?url=' + encodeURIComponent(url);
-    const rCF = await fetch(cfWorker, opts);
-    if (rCF && rCF.ok) return rCF;
-  } catch (e) {}
-  // Try local proxy (for development with proxy-server.js)
-  try {
-    const local = 'http://127.0.0.1:3000/proxy?url=' + encodeURIComponent(url);
-    const rLocal = await fetch(local, opts);
-    if (rLocal && rLocal.ok) return rLocal;
-  } catch (e) {}
-  // Fallback to public proxies (may be unreliable)
+  // Try public CORS proxies
   try {
     const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const r2 = await fetch(proxy, opts);
