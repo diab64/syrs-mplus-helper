@@ -367,7 +367,14 @@ async function fetchWithCorsFallback(url, opts) {
     } catch (e) {}
   }
 
-  // Try public CORS proxies
+  // Try Vercel serverless function proxy (our own backend)
+  try {
+    const vercelProxy = '/api/proxy?url=' + encodeURIComponent(url);
+    const rVercel = await fetch(vercelProxy, opts);
+    if (rVercel.ok) return rVercel;
+  } catch (e) {}
+
+  // Fallback to public CORS proxies
   try {
     const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
     const r2 = await fetch(proxy, opts);
