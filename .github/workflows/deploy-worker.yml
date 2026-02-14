@@ -17,11 +17,18 @@ jobs:
           node-version: '20'
       - name: Install wrangler
         run: npm install -g wrangler
-      - name: Deploy worker
+      - name: Set API key secret
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           RAIDERIO_API_KEY: ${{ secrets.RAIDERIO_API_KEY }}
         run: |
           cd worker
-          npx wrangler deploy --var RAIDERIO_API_KEY:"$RAIDERIO_API_KEY"
+          echo "$RAIDERIO_API_KEY" | npx wrangler secret put RAIDERIO_API_KEY
+      - name: Deploy worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          cd worker
+          npx wrangler deploy
