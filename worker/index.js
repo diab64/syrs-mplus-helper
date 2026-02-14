@@ -1,3 +1,4 @@
+// CORS proxy worker for Syr's M+ Helper
 addEventListener('fetch', event => {
   event.respondWith(handle(event.request));
 });
