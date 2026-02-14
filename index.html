@@ -354,12 +354,19 @@ function getAffixesForLevel(kl, weekly) {
   return a;
 }
 
-// Try a direct fetch first; on network/CORS failure, retry via CORS proxy.
+// Fetch with CORS proxy fallback for Raider.io API
 async function fetchWithCorsFallback(url, opts) {
-  try {
-    const r = await fetch(url, opts);
-    if (r.ok) return r;
-  } catch (e) {}
+  // For raider.io URLs, skip direct fetch and use proxy immediately
+  // (direct fetch returns 200 but browser blocks response due to CORS)
+  const needsProxy = url.includes('raider.io');
+
+  if (!needsProxy) {
+    try {
+      const r = await fetch(url, opts);
+      if (r.ok) return r;
+    } catch (e) {}
+  }
+
   // Try Cloudflare Worker proxy (deployed for this app)
   try {
     const cfWorker = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev/proxy?url=' + encodeURIComponent(url);
