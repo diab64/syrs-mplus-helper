@@ -20,19 +20,21 @@ async function handle(request) {
 
   try {
     const url = new URL(request.url);
-    const target = url.searchParams.get('url');
+    let target = url.searchParams.get('url');
     if (!target) return new Response('Missing url query param', { status: 400 });
 
-    // Fetch with RaiderIO API key for authenticated access
+    // Add RaiderIO API key as query parameter for authenticated access
+    if (typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY) {
+      const targetUrl = new URL(target);
+      targetUrl.searchParams.set('access_token', RAIDERIO_API_KEY);
+      target = targetUrl.toString();
+    }
+
+    // Fetch with standard headers
     const requestHeaders = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       'Accept': 'application/json'
     };
-
-    // Add API key if available (set via environment variable)
-    if (typeof RAIDERIO_API_KEY !== 'undefined') {
-      requestHeaders['Authorization'] = `Bearer ${RAIDERIO_API_KEY}`;
-    }
 
     const upstream = await fetch(target, { headers: requestHeaders });
     const text = await upstream.text();
