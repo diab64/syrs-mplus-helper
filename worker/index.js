@@ -9,7 +9,17 @@ async function handle(request) {
     const url = new URL(request.url);
     const target = url.searchParams.get('url');
     if (!target) return new Response('Missing url query param', { status: 400 });
-    const upstream = await fetch(target, { headers: { 'User-Agent': 'syrs-mplus-helper-proxy' } });
+
+    // Send proper headers to avoid being blocked
+    const upstream = await fetch(target, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://diab64.github.io/'
+      }
+    });
+
     const body = await upstream.arrayBuffer();
     const headers = new Headers(upstream.headers);
     // Ensure CORS is allowed for browser requests
