@@ -369,7 +369,7 @@ async function fetchWithCorsFallback(url, opts) {
 
   // Try Cloudflare Worker proxy (deployed for this app)
   try {
-    const cfWorker = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev/proxy?url=' + encodeURIComponent(url);
+    const cfWorker = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev/?url=' + encodeURIComponent(url);
     const rCF = await fetch(cfWorker, opts);
     if (rCF && rCF.ok) return rCF;
   } catch (e) {}
