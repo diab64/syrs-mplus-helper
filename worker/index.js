@@ -24,17 +24,17 @@ async function handle(request) {
     if (!target) return new Response('Missing url query param', { status: 400 });
 
     // Fetch with RaiderIO API key for authenticated access
-    const headers = {
+    const requestHeaders = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       'Accept': 'application/json'
     };
 
     // Add API key if available (set via environment variable)
     if (typeof RAIDERIO_API_KEY !== 'undefined') {
-      headers['Authorization'] = `Bearer ${RAIDERIO_API_KEY}`;
+      requestHeaders['Authorization'] = `Bearer ${RAIDERIO_API_KEY}`;
     }
 
-    const upstream = await fetch(target, { headers });
+    const upstream = await fetch(target, { headers: requestHeaders });
     const text = await upstream.text();
 
     // Check if we got HTML instead of JSON (blocked)
