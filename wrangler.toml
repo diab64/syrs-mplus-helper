@@ -1,0 +1,6 @@
+name = "syrs-mplus-helper-proxy"
+type = "javascript"
+compatibility_date = "2026-02-13"
+
+# Do NOT commit your account_id here. The GitHub Action will pass --account-id when publishing.
+# account_id = ""
