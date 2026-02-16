@@ -295,39 +295,137 @@ const REGIONS = [
   { value: 'tw', label: 'TW' },
 ];
 
-// Small offline fallback for realms so autocomplete works when the page
-// is opened from file:// (no CORS-enabled fetch). This is a minimal
-// list — raider.io will still be queried when available.
+// Blizzard API region hosts
+const BLIZZARD_API_HOSTS = {
+  us: 'us.api.blizzard.com',
+  eu: 'eu.api.blizzard.com',
+  kr: 'kr.api.blizzard.com',
+  tw: 'tw.api.blizzard.com',
+};
+
+// Map Blizzard internal season IDs to marketing names
+const SEASON_NAMES = {
+  13: 'TWW Season 1', 14: 'TWW Season 2', 15: 'TWW Season 3',
+  16: 'TWW Season 4', 17: 'TWW Season 5',
+};
+function getSeasonDisplayName(id) {
+  return SEASON_NAMES[id] || `Season ${id}`;
+}
+
+// Small offline fallback for realms so autocomplete works without API
 const FALLBACK_REALMS = {
   us: [
     { name: 'Stormrage', slug: 'stormrage' },
     { name: 'Sargeras', slug: 'sargeras' },
     { name: 'Proudmoore', slug: 'proudmoore' },
     { name: 'Tichondrius', slug: 'tichondrius' },
+    { name: 'Area 52', slug: 'area-52' },
+    { name: 'Illidan', slug: 'illidan' },
+    { name: 'Mal\'Ganis', slug: 'malganis' },
+    { name: 'Thrall', slug: 'thrall' },
   ],
   eu: [
     { name: 'Silvermoon', slug: 'silvermoon' },
     { name: 'Ragnaros', slug: 'ragnaros' },
     { name: 'Draenor', slug: 'draenor' },
+    { name: 'Kazzak', slug: 'kazzak' },
+    { name: 'Twisting Nether', slug: 'twisting-nether' },
   ],
-  kr: [ { name: 'Azshara', slug: 'azshara' } ],
-  tw: [ { name: 'Illidan', slug: 'illidan' } ],
+  kr: [ { name: 'Azshara', slug: 'azshara' }, { name: 'Hellscream', slug: 'hellscream' } ],
+  tw: [ { name: 'Bleeding Hollow', slug: 'bleeding-hollow' }, { name: 'Sundown Marsh', slug: 'sundown-marsh' } ],
 };
 
-// Fallback dungeons — these only matter if the API returns zero runs for a character
+// TWW Season 3 dungeon pool (fallback if API returns no runs)
 const FALLBACK_DUNGEONS = [
-  { slug: 'ara-kara-city-of-echoes', name: 'Ara-Kara, City of Echoes', short: 'ARA', timer: 1920 },
-  { slug: 'the-dawnbreaker', name: 'The Dawnbreaker', short: 'DAWN', timer: 2040 },
-  { slug: 'operation-floodgate', name: 'Operation: Floodgate', short: 'FLOOD', timer: 1920 },
-  { slug: 'priory-of-the-sacred-flame', name: 'Priory of the Sacred Flame', short: 'PSF', timer: 2100 },
-  { slug: 'halls-of-atonement', name: 'Halls of Atonement', short: 'HOA', timer: 1920 },
-  { slug: 'tazavesh-streets-of-wonder', name: 'Tazavesh: Streets of Wonder', short: 'STREETS', timer: 2400 },
+  { slug: 'eco-dome-aldani', name: "Eco-Dome Al'dani", short: 'ECO', timer: 1860 },
+  { slug: 'ara-kara-city-of-echoes', name: 'Ara-Kara, City of Echoes', short: 'ARA', timer: 1800 },
+  { slug: 'the-dawnbreaker', name: 'The Dawnbreaker', short: 'DAWN', timer: 1860 },
+  { slug: 'priory-of-the-sacred-flame', name: 'Priory of the Sacred Flame', short: 'PSF', timer: 1950 },
+  { slug: 'operation-floodgate', name: 'Operation: Floodgate', short: 'FLOOD', timer: 1980 },
+  { slug: 'halls-of-atonement', name: 'Halls of Atonement', short: 'HOA', timer: 1860 },
+  { slug: 'tazavesh-streets-of-wonder', name: 'Tazavesh: Streets of Wonder', short: 'STREETS', timer: 2340 },
   { slug: 'tazavesh-soleahs-gambit', name: "Tazavesh: So'leah's Gambit", short: 'GAMBIT', timer: 1800 },
-  { slug: 'eco-dome-aldani', name: "Eco-Dome Al'dani", short: 'ECO', timer: 1800 },
 ];
 
+// Fetch current season's dungeon list dynamically from Blizzard API
+async function fetchCurrentSeasonDungeons() {
+  try {
+    const host = BLIZZARD_API_HOSTS['us'];
+    // Get current season ID
+    const seasonIndex = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/season/index?namespace=dynamic-us&locale=en_US`
+    );
+    const currentSeason = seasonIndex?.current_season?.id || seasonIndex?.seasons?.[seasonIndex.seasons.length - 1]?.id;
+    if (!currentSeason) return null;
+
+    // Get season detail — contains periods with dungeon references
+    const seasonDetail = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/season/${currentSeason}?namespace=dynamic-us&locale=en_US`
+    );
+
+    // Get current period to find the active dungeons
+    const periodIndex = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/period/index?namespace=dynamic-us&locale=en_US`
+    );
+    const currentPeriodId = periodIndex?.current_period?.id;
+
+    // Try to get the current period's leaderboard index — this lists only the active season dungeons
+    if (currentPeriodId) {
+      try {
+        // The connected-realm leaderboard index lists current dungeons
+        // Use connected realm 11 (Stormrage, a large US realm) as a reference
+        const lbIndex = await fetchBlizzardApi(
+          `https://${host}/data/wow/connected-realm/11/mythic-leaderboard/index?namespace=dynamic-us&locale=en_US`
+        );
+        if (lbIndex?.current_leaderboards?.length) {
+          const dungeons = [];
+          const seen = new Set();
+          for (const lb of lbIndex.current_leaderboards) {
+            const name = lb.name || '';
+            if (!name || seen.has(name)) continue;
+            seen.add(name);
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            const short = name.split(/[\s:,!]+/).filter(w=>w).map(w => w[0]).join('').toUpperCase().substring(0, 5);
+            dungeons.push({ slug, name, short, timer: 2100 });
+          }
+          if (dungeons.length >= 4 && dungeons.length <= 12) {
+            // Now fetch individual dungeon details for accurate timers (only 8ish calls)
+            for (let i = 0; i < dungeons.length; i++) {
+              const lb = lbIndex.current_leaderboards.find(l => l.name === dungeons[i].name);
+              if (lb?.id) {
+                try {
+                  const detail = await fetchBlizzardApi(
+                    `https://${host}/data/wow/mythic-keystone/dungeon/${lb.id}?namespace=dynamic-us&locale=en_US`
+                  );
+                  if (detail.keystone_upgrades?.[0]?.qualifying_duration) {
+                    dungeons[i].timer = Math.round(detail.keystone_upgrades[0].qualifying_duration / 1000);
+                  }
+                } catch(e) { /* use default timer */ }
+              }
+            }
+            return { dungeons, seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
+          }
+        }
+      } catch(e) {
+        console.log('Leaderboard approach failed, using season periods:', e);
+      }
+    }
+
+    // Fallback: extract dungeons from season detail periods if available
+    if (seasonDetail?.periods?.length) {
+      // Season periods list the dungeon rotation
+      console.log('Season detail has', seasonDetail.periods.length, 'periods');
+    }
+
+    return { dungeons: [], seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
+  } catch(e) {
+    console.log('Failed to fetch current season dungeons:', e);
+  }
+  return null;
+}
+
 function getDungeonIcon(slug) {
-  return `https://cdnassets.raider.io/images/dungeons/expansion10/base/${slug}.jpg`;
+  return `https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(slug.substring(0,4).toUpperCase())}`;
 }
 
 function calcRunScore(keyLevel, stars) {
@@ -354,42 +452,30 @@ function getAffixesForLevel(kl, weekly) {
   return a;
 }
 
-// Fetch with CORS proxy fallback for Raider.io API
-async function fetchWithCorsFallback(url, opts) {
-  // Check if we're running locally (localhost or 127.0.0.1)
+// Fetch from Blizzard API through our proxy (handles OAuth2 server-side)
+async function fetchBlizzardApi(url) {
   const isLocal = window.location.hostname === 'localhost' ||
-                  window.location.hostname === '127.0.0.1' ||
-                  window.location.protocol === 'file:';
+                  window.location.hostname === '127.0.0.1';
 
-  // If local, try direct fetch first (no CORS restrictions on localhost)
+  // Local dev server proxy
   if (isLocal) {
-    try {
-      const r = await fetch(url, opts);
-      if (r.ok) return r;
-    } catch (e) {
-      console.log('Direct fetch failed locally, trying proxies:', e);
+    const proxyUrl = '/api/blizzard?url=' + encodeURIComponent(url);
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+      throw new Error(err.error || `API error ${resp.status}`);
     }
+    return resp.json();
   }
 
-  // Try Vercel serverless function proxy (our own backend)
+  // Vercel serverless proxy
   try {
     const vercelProxy = '/api/proxy?url=' + encodeURIComponent(url);
-    const rVercel = await fetch(vercelProxy, opts);
-    if (rVercel.ok) return rVercel;
+    const resp = await fetch(vercelProxy);
+    if (resp.ok) return resp.json();
   } catch (e) {}
 
-  // Fallback to public CORS proxies
-  try {
-    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-    const r2 = await fetch(proxy, opts);
-    if (r2.ok) return r2;
-  } catch (e) {}
-  try {
-    const proxy2 = 'https://corsproxy.io/?' + encodeURIComponent(url);
-    return fetch(proxy2, opts);
-  } catch (e) {
-    throw e;
-  }
+  throw new Error('No API proxy available. Run the local server with: python server.py');
 }
 
 function getScoreColor(s) {
@@ -401,7 +487,8 @@ function getScoreColor(s) {
   return '#9d9d9d';
 }
 
-function buildDungeonState(bestRuns, altRuns, dungeonList) {
+// Build dungeon state from Blizzard API best_runs
+function buildDungeonState(bestRuns, dungeonList) {
   const st = {};
   dungeonList.forEach(d => {
     st[d.slug] = {
@@ -412,14 +499,35 @@ function buildDungeonState(bestRuns, altRuns, dungeonList) {
       totalScore: 0,
     };
   });
-  [...(bestRuns||[]), ...(altRuns||[])].forEach(run => {
-    const slug = run.dungeon?.slug || '';
-    const key = Object.keys(st).find(k => k === slug || st[k].name === run.dungeon?.name || st[k].short === run.short_name);
-    if (!key) return;
-    const aff = run.affixes?.[0]?.name?.toLowerCase()?.includes('tyrannical') ? 'tyrannical' : 'fortified';
-    const rs = run.score || calcRunScore(run.mythic_level, run.num_keystone_upgrades || 1);
-    if (rs > st[key][aff].score) {
-      st[key][aff] = { score: rs, keyLevel: run.mythic_level, stars: run.num_keystone_upgrades || 1 };
+  (bestRuns || []).forEach(run => {
+    // Blizzard API format: dungeon.name, keystone_level, keystone_upgrades, keystone_affixes
+    const dungeonName = run.dungeon?.name || '';
+    const dungeonSlug = dungeonName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const key = Object.keys(st).find(k =>
+      k === dungeonSlug ||
+      st[k].name.toLowerCase() === dungeonName.toLowerCase() ||
+      dungeonSlug.includes(k) || k.includes(dungeonSlug)
+    );
+    if (!key) {
+      // New dungeon not in fallback list — add it dynamically
+      const short = dungeonName.split(/[\s:,]+/).map(w => w[0]).join('').toUpperCase().substring(0, 5);
+      const timer = run.duration ? Math.round(run.duration / 1000 * 1.4) : 2100;
+      st[dungeonSlug] = {
+        name: dungeonName, slug: dungeonSlug, short, timer,
+        icon: getDungeonIcon(dungeonSlug),
+        fortified: { score: 0, keyLevel: 0, stars: 0 },
+        tyrannical: { score: 0, keyLevel: 0, stars: 0 },
+        totalScore: 0,
+      };
+    }
+    const k = key || dungeonSlug;
+    const affixes = (run.keystone_affixes || []).map(a => a.name?.toLowerCase() || '');
+    const aff = affixes.includes('tyrannical') ? 'tyrannical' : 'fortified';
+    const kl = run.keystone_level || run.mythic_level || 0;
+    const stars = run.keystone_upgrades != null ? run.keystone_upgrades : (run.is_completed_within_time ? 1 : 0);
+    const rs = run.map_rating?.rating || calcRunScore(kl, stars);
+    if (rs > st[k][aff].score) {
+      st[k][aff] = { score: rs, keyLevel: kl, stars: Math.max(stars, 1) };
     }
   });
   Object.keys(st).forEach(k => { st[k].totalScore = calcDungeonTotalScore(st[k].fortified.score, st[k].tyrannical.score); });
@@ -612,7 +720,7 @@ function PrivacyModal({ onClose }) {
         <p><strong>What we store:</strong> When you save a search, we store the character name, realm, region, target score, and constraint settings in a browser cookie on your device.</p>
         <p><strong>What we do NOT store:</strong> No personal information, email addresses, IP addresses, or analytics data. No login system, tracking, or third-party sharing.</p>
         <p><strong>How cookies work here:</strong> A single cookie (<code>syrmplus_searches</code>) remembers your past searches so you can quickly re-run them. It is stored entirely on YOUR device.</p>
-        <p><strong>No server storage:</strong> All data stays in your browser. The only external requests go to the public Raider.io API.</p>
+        <p><strong>No server storage:</strong> All data stays in your browser. The only external requests go to the official Blizzard WoW API.</p>
         <p><strong>Deleting your data:</strong> Use "Clear All" in Saved Searches, or clear cookies in your browser settings.</p>
         <p><strong>Duration:</strong> Cookies expire after 90 days.</p>
         <p style={{ marginTop:16, paddingTop:12, borderTop:'1px solid var(--border)' }}><em>Last updated: {new Date().toLocaleDateString()}</em></p>
@@ -650,25 +758,46 @@ function App() {
   useEffect(() => { document.body.setAttribute('data-theme', theme); }, [theme]);
   useEffect(() => { setSavedSearches(loadFromCookies()); }, []);
 
-  // Fetch realm lists from raider.io on mount
+  // Fetch realm lists and current season dungeons from Blizzard API on mount
   useEffect(() => {
     async function go() {
       setRealmsLoading(true);
+
+      // Fetch realms for all regions
       const nd = { us:[], eu:[], kr:[], tw:[] };
       for (const r of ['us','eu','kr','tw']) {
         try {
-          const resp = await fetchWithCorsFallback(`https://raider.io/api/v1/realms?region=${r}`);
-          if (resp && resp.ok) {
-            const d = await resp.json();
-            if (d.realms && d.realms.length) nd[r] = d.realms.map(x => ({ name: x.name, slug: x.slug })).sort((a,b) => a.name.localeCompare(b.name));
+          const host = BLIZZARD_API_HOSTS[r];
+          const data = await fetchBlizzardApi(`https://${host}/data/wow/realm/index?namespace=dynamic-${r}&locale=en_US`);
+          if (data.realms && data.realms.length) {
+            nd[r] = data.realms
+              .filter(x => x.name && x.slug
+                && !/inst|auxiliary|test|tournament/i.test(x.name)
+                && !/inst|auxiliary|test|tournament/i.test(x.slug)
+                && !/^\d/.test(x.slug)
+                && !/[A-Z]{2}\d/.test(x.name))
+              .map(x => ({ name: x.name, slug: x.slug }))
+              .sort((a,b) => a.name.localeCompare(b.name));
           }
         } catch(e) {
-          // ignore fetch errors — we'll fall back to a small bundled list below
+          console.log(`Failed to fetch ${r} realms:`, e);
         }
-        // If API returned nothing (or fetch blocked from file://), use fallback
         if (!nd[r] || nd[r].length === 0) nd[r] = FALLBACK_REALMS[r] || [];
       }
       setRealmsData(nd);
+
+      // Fetch current season dungeon list dynamically
+      try {
+        const result = await fetchCurrentSeasonDungeons();
+        if (result?.dungeons?.length) {
+          setDungeonList(result.dungeons);
+          if (result.seasonId) setSeasonName(getSeasonDisplayName(result.seasonId));
+          console.log(`Loaded ${result.dungeons.length} dungeons for season ${result.seasonId}`);
+        }
+      } catch(e) {
+        console.log('Using fallback dungeon list:', e);
+      }
+
       setRealmsLoading(false);
     }
     go();
@@ -691,40 +820,80 @@ function App() {
     setLoading(true); setError(''); setCharData(null); setDungeonState(null); setResults(null);
     try {
       const slug = getRealmSlug(realm);
-      const url = `https://raider.io/api/v1/characters/profile?region=${region}&realm=${encodeURIComponent(slug)}&name=${encodeURIComponent(charName.trim())}&fields=mythic_plus_scores_by_season:current,mythic_plus_best_runs:all,mythic_plus_alternate_runs:all,gear`;
-      const resp = await fetchWithCorsFallback(url);
-      if (!resp.ok) {
-        if (resp.status===400||resp.status===404) throw new Error('Character not found. Check the name, realm, and region.');
-        throw new Error(`Raider.io API error (${resp.status})`);
+      const name = charName.trim().toLowerCase();
+      const host = BLIZZARD_API_HOSTS[region];
+      const ns = `profile-${region}`;
+
+      // Fetch character profile
+      const profile = await fetchBlizzardApi(
+        `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}?namespace=${ns}&locale=en_US`
+      );
+
+      // Fetch M+ keystone profile to get current rating and season list
+      let mpProfile = null;
+      try {
+        mpProfile = await fetchBlizzardApi(
+          `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile?namespace=${ns}&locale=en_US`
+        );
+      } catch(e) { console.log('No M+ profile:', e); }
+
+      // Get the current/latest season's best runs
+      let seasonData = null;
+      let currentSeasonId = null;
+      if (mpProfile?.seasons?.length) {
+        // Use the most recent season
+        currentSeasonId = mpProfile.seasons[mpProfile.seasons.length - 1]?.id;
+        if (!currentSeasonId && mpProfile.seasons[0]?.id) currentSeasonId = mpProfile.seasons[0].id;
       }
-      const data = await resp.json();
-      setCharData(data);
-      if (data.mythic_plus_scores_by_season?.[0]?.season) setSeasonName(data.mythic_plus_scores_by_season[0].season);
-      const best = data.mythic_plus_best_runs||[], alt = data.mythic_plus_alternate_runs||[];
-      let dl = FALLBACK_DUNGEONS;
-      if (best.length||alt.length) {
-        const seen = new Set(), apiD = [];
-        [...best,...alt].forEach(r => {
-          const s = r.dungeon?.slug;
-          if (s && !seen.has(s)) {
-            seen.add(s);
-            apiD.push({ slug:s, name:r.dungeon?.name||s, short:r.short_name||s.substring(0,4).toUpperCase(), timer:Math.round((r.par_time_ms||2100000)/1000) });
-          }
-        });
-        if (apiD.length) { dl = apiD; setDungeonList(apiD); }
+      if (currentSeasonId) {
+        try {
+          seasonData = await fetchBlizzardApi(
+            `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile/season/${currentSeasonId}?namespace=${ns}&locale=en_US`
+          );
+        } catch(e) { console.log('Failed to fetch season data:', e); }
       }
-      setDungeonState(buildDungeonState(best, alt, dl));
+
+      // Fetch character media for avatar
+      let mediaData = null;
+      try {
+        mediaData = await fetchBlizzardApi(
+          `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/character-media?namespace=${ns}&locale=en_US`
+        );
+      } catch(e) { console.log('No character media:', e); }
+
+      // Transform into app-compatible format
+      const avatarAsset = mediaData?.assets?.find(a => a.key === 'avatar');
+      const mpRating = seasonData?.mythic_rating?.rating || mpProfile?.current_mythic_rating?.rating || 0;
+
+      const charInfo = {
+        name: profile.name,
+        realm: profile.realm?.name || realm,
+        region: region,
+        class: profile.character_class?.name || '',
+        active_spec_name: profile.active_spec?.name || '',
+        thumbnail_url: avatarAsset?.value || null,
+        mythic_plus_scores_by_season: [{ season: `season-${currentSeasonId || 'current'}`, scores: { all: mpRating } }],
+      };
+      setCharData(charInfo);
+      if (currentSeasonId) setSeasonName(getSeasonDisplayName(currentSeasonId));
+
+      // Build dungeon state from best runs, using the already-loaded dungeon list
+      const bestRuns = seasonData?.best_runs || [];
+      console.log('=== DEBUG: dungeonList names ===', dungeonList.map(d => d.name));
+      console.log('=== DEBUG: bestRuns dungeon names ===', bestRuns.map(r => r.dungeon?.name));
+      console.log('=== DEBUG: bestRuns sample ===', bestRuns[0]);
+      setDungeonState(buildDungeonState(bestRuns, dungeonList));
     } catch(e) {
-      if (e.message?.includes('NetworkError')||e.message?.includes('Failed to fetch')||(e.name==='TypeError'&&e.message?.includes('fetch')))
-        setError('Network request blocked — please download the HTML file and open it directly in your browser.');
-      else setError(e.message||'Failed to look up character.');
+      if (e.message?.includes('NetworkError') || e.message?.includes('Failed to fetch') || (e.name==='TypeError' && e.message?.includes('fetch')))
+        setError('Network error — make sure python server.py is running with Blizzard API credentials.');
+      else setError(e.message || 'Failed to look up character.');
     } finally { setLoading(false); }
   }
 
   function calculatePaths() {
     if (!dungeonState) return;
-    const t = parseInt(targetScore)||0, c = charData?.mythic_plus_scores_by_season?.[0]?.scores?.all||0;
-    if (t<=c) { setError('Target score must be higher than current score.'); return; }
+    const t = parseInt(targetScore)||0, c = charData?.mythic_plus_scores_by_season?.[0]?.scores?.all || 0;
+    if (t <= c) { setError('Target score must be higher than current score.'); return; }
     setError('');
     const con = { allowedDungeons:allowedDungeons.length?allowedDungeons:null, maxKeyLevel:maxKeyLevel?parseInt(maxKeyLevel):null, useKeystones:advancedMode };
     const ks = advancedMode ? keystones.filter(k=>k.slug&&k.level).map(k=>({slug:k.slug,level:parseInt(k.level)})) : null;
@@ -750,6 +919,8 @@ function App() {
 
   const formatSeasonName = (s) => {
     if (!s) return '';
+    // Handle both "TWW Season 2" and "season-tww-2" formats
+    if (s.startsWith('TWW')) return s;
     return s.replace(/-/g,' ').replace('season tww ','TWW Season ').replace('season df ','DF Season ').replace('season ','Season ').replace(/\b\w/g,c=>c.toUpperCase());
   };
 
@@ -791,7 +962,7 @@ function App() {
                 {loading?'...':'Look Up'}
               </button>
             </div>
-            {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Raider.io...</div>}
+            {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Blizzard API...</div>}
             {charData && (
               <div className="target-row">
                 <div className="input-group">
@@ -941,7 +1112,7 @@ function App() {
         )}
       </main>
       <footer className="footer">
-        <p>Syr's M+ Score Goal Helper — Data from <a href="https://raider.io" target="_blank" rel="noopener noreferrer">Raider.io</a> • <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
+        <p>Syr's M+ Score Goal Helper — Data from <a href="https://develop.battle.net/" target="_blank" rel="noopener noreferrer">Blizzard WoW API</a> • <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
         <p style={{marginTop:4}}>Score calculations are approximate. Dungeon list and season update automatically from the API.</p>
       </footer>
       {showPrivacy && <PrivacyModal onClose={()=>setShowPrivacy(false)} />}

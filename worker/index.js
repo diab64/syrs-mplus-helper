@@ -1,9 +1,38 @@
 // CORS proxy worker for Syr's M+ Helper
-// Forwards API requests to bypass CORS restrictions
-// Uses Raider.IO API key for authenticated access
+// Proxies Blizzard API requests with OAuth2 authentication
+// Secrets required: BLIZZARD_CLIENT_ID, BLIZZARD_CLIENT_SECRET
+
+let tokenCache = { access_token: null, expires_at: 0 };
+
 addEventListener('fetch', event => {
   event.respondWith(handle(event.request));
 });
+
+async function getBlizzardToken() {
+  // Return cached token if still valid (60s buffer)
+  if (tokenCache.access_token && Date.now() / 1000 < tokenCache.expires_at - 60) {
+    return tokenCache.access_token;
+  }
+
+  const credentials = btoa(`${BLIZZARD_CLIENT_ID}:${BLIZZARD_CLIENT_SECRET}`);
+  const resp = await fetch('https://oauth.battle.net/token', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  if (!resp.ok) {
+    throw new Error(`Token request failed: ${resp.status}`);
+  }
+
+  const data = await resp.json();
+  tokenCache.access_token = data.access_token;
+  tokenCache.expires_at = Date.now() / 1000 + (data.expires_in || 86399);
+  return data.access_token;
+}
 
 async function handle(request) {
   // Handle CORS preflight
@@ -20,70 +49,44 @@ async function handle(request) {
 
   try {
     const url = new URL(request.url);
-    let target = url.searchParams.get('url');
+    const target = url.searchParams.get('url');
 
-    // Debug endpoint to check if API key is set
-    if (target === 'debug') {
-      const hasKey = typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY;
-      const keyPreview = hasKey ? RAIDERIO_API_KEY.substring(0, 8) + '...' : 'NOT SET';
-      return new Response(JSON.stringify({
-        apiKeySet: hasKey,
-        keyPreview: keyPreview,
-        keyLength: hasKey ? RAIDERIO_API_KEY.length : 0
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+    if (!target) {
+      return new Response(JSON.stringify({ error: 'Missing url query param' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
-    if (!target) return new Response('Missing url query param', { status: 400 });
-
-    // Add RaiderIO API key as query parameter for authenticated access
-    const hasKey = typeof RAIDERIO_API_KEY !== 'undefined' && RAIDERIO_API_KEY;
-    if (hasKey) {
-      const targetUrl = new URL(target);
-      targetUrl.searchParams.set('access_token', RAIDERIO_API_KEY);
-      target = targetUrl.toString();
-    } else {
-      // If no API key, return error to help with debugging
-      return new Response(JSON.stringify({error: 'API key not configured in worker'}), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Fetch with realistic browser headers to avoid bot detection
-    const requestHeaders = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-      'Accept': 'application/json, text/plain, */*',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Referer': 'https://raider.io/',
-      'Origin': 'https://raider.io',
-      'Sec-Fetch-Dest': 'empty',
-      'Sec-Fetch-Mode': 'cors',
-      'Sec-Fetch-Site': 'same-origin'
-    };
-
-    const upstream = await fetch(target, { headers: requestHeaders });
-    const text = await upstream.text();
-
-    // Check if we got HTML instead of JSON (blocked)
-    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-      return new Response(JSON.stringify({error: 'API returned HTML instead of JSON - likely blocked'}), {
+    // Only allow Blizzard API domains
+    const targetUrl = new URL(target);
+    if (!targetUrl.hostname.endsWith('.battle.net') && !targetUrl.hostname.endsWith('.blizzard.com')) {
+      return new Response(JSON.stringify({ error: 'Only Blizzard API domains are allowed' }), {
         status: 403,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
+    // Check credentials are configured
+    const hasCredentials = typeof BLIZZARD_CLIENT_ID !== 'undefined' && BLIZZARD_CLIENT_ID
+                        && typeof BLIZZARD_CLIENT_SECRET !== 'undefined' && BLIZZARD_CLIENT_SECRET;
+    if (!hasCredentials) {
+      return new Response(JSON.stringify({ error: 'Blizzard API credentials not configured in worker secrets' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    const token = await getBlizzardToken();
+
+    const upstream = await fetch(target, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      }
+    });
+
+    const text = await upstream.text();
     const headers = new Headers(upstream.headers);
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
@@ -91,12 +94,9 @@ async function handle(request) {
 
     return new Response(text, { status: upstream.status, headers });
   } catch (err) {
-    return new Response(JSON.stringify({error: 'Proxy error', message: err.message}), {
+    return new Response(JSON.stringify({ error: 'Proxy error', message: err.message }), {
       status: 502,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 }
