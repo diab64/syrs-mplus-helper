@@ -59,8 +59,12 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-.header { padding: 24px 0; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+.header { padding: 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px; max-height: 60px; }
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; }
 .logo { display: flex; align-items: center; gap: 12px; }
 .logo-icon {
@@ -95,13 +99,15 @@ body {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); }
 .btn-secondary:hover { background: var(--bg-hover); }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn-lookup { background: #5a8fd4; color: #fff; }
+.btn-lookup:hover { background: #4a7ebd; }
+.btn-sm { padding: 6px 14px; font-size: 16px; }
 .btn-ghost { background: transparent; color: var(--text-secondary); padding: 6px 10px; }
 .btn-ghost:hover { color: var(--text-primary); background: var(--bg-hover); }
 .btn-danger { background: transparent; color: var(--danger); }
 .btn-danger:hover { background: rgba(248,113,113,0.1); }
 .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
-.input-group label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.input-group label { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
 .input, select {
   padding: 10px 14px; border-radius: var(--radius-sm);
   background: var(--bg-input); border: 1px solid var(--border);
@@ -131,14 +137,16 @@ select {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 24px; transition: all var(--transition);
 }
-.search-grid { display: grid; grid-template-columns: 1fr 1fr 140px 120px; gap: 12px; align-items: end; }
+.search-grid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: end; }
+.search-grid.full-width { grid-template-columns: 1fr; }
+.search-grid.two-col { grid-template-columns: 1fr 1fr 140px 120px; }
 .target-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: end; margin-top: 16px; }
 .tabs { display: flex; gap: 4px; margin-bottom: 24px; }
 .tab {
   padding: 10px 20px; border-radius: var(--radius-sm);
-  background: transparent; color: var(--text-secondary);
+  background: var(--bg-input); color: var(--text-secondary);
   font-family: 'Outfit', sans-serif; font-weight: 500;
-  font-size: 14px; border: none; cursor: pointer; transition: all var(--transition);
+  font-size: 14px; border: 1px solid var(--border); cursor: pointer; transition: all var(--transition);
 }
 .tab:hover { color: var(--text-primary); background: var(--bg-hover); }
 .tab.active { background: var(--accent); color: #fff; }
@@ -158,7 +166,8 @@ select {
 .dungeon-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dungeon-score-col { text-align: right; min-width: 80px; }
 .dungeon-score { font-size: 20px; font-weight: 700; font-family: 'Chivo Mono', monospace; }
-.dungeon-score-label { font-size: 11px; color: var(--text-muted); }
+[data-theme="light"] .dungeon-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+.dungeon-score-label { font-size: 11px; color: var(--text-secondary); }
 .star-badge {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
@@ -176,7 +185,7 @@ select {
   padding: 1px 6px; border-radius: 4px; font-size: 10px;
   background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border);
 }
-.time-info { font-size: 12px; color: var(--text-muted); font-family: 'Chivo Mono', monospace; }
+.time-info { font-size: 12px; color: var(--text-secondary); font-family: 'Chivo Mono', monospace; }
 .constraints-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
 .dungeon-checkboxes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
 .checkbox-label {
@@ -262,58 +271,140 @@ select {
   background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(91,156,245,0.2);
 }
 .footer {
-  margin-top: 48px; padding: 24px 0; border-top: 1px solid var(--border);
+  max-width: 1400px; margin: 48px auto 0; padding: 24px 20px;
+  border-top: 1px solid var(--border);
   text-align: center; font-size: 12px; color: var(--text-muted);
 }
 .footer a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .footer a:hover { text-decoration: underline; }
-/* Two-column results layout */
-.results-layout {
-  display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start;
-}
-.results-main { min-width: 0; }
-.results-sidebar { min-width: 0; }
-
-/* Compact dungeon rows for sidebar */
+/* Compact dungeon rows for left panel */
 .compact-dungeon-row {
   display: flex; align-items: center; gap: 10px;
-  padding: 6px 10px; border-radius: var(--radius-sm);
+  padding: 4px 10px; border-radius: var(--radius-sm);
   background: var(--bg-tertiary); border: 1px solid var(--border);
-  margin-bottom: 4px; transition: all var(--transition);
+  margin-bottom: 2px; transition: all var(--transition);
 }
 .compact-dungeon-thumb {
   width: 36px; height: 36px; border-radius: 6px;
   object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-input);
 }
 .compact-dungeon-info {
-  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;
+  flex: 1; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 6px;
 }
 .compact-dungeon-name {
   font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.compact-dungeon-meta {
-  display: flex; align-items: center; gap: 6px;
-}
+.compact-dungeon-meta { display: flex; align-items: center; gap: 4px; }
 .compact-key-level {
-  font-size: 13px; font-weight: 700; font-family: 'Chivo Mono', monospace; color: var(--accent);
+  font-size: 14px; font-weight: 700; font-family: 'Chivo Mono', monospace; color: var(--accent);
+  flex-shrink: 0;
 }
-.compact-stars {
-  color: #fbbf24; font-size: 12px; letter-spacing: 1px;
-}
+.compact-stars { color: #fbbf24; font-size: 14px; letter-spacing: 0px; flex-shrink: 0; }
 .compact-score {
-  font-size: 14px; font-weight: 700; font-family: 'Chivo Mono', monospace;
-  text-align: right; min-width: 45px; flex-shrink: 0;
+  font-size: 15px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+  text-align: right; min-width: 50px; flex-shrink: 0;
+}
+[data-theme="light"] .compact-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+/* Two-column app layout (40/60 split) */
+.app-two-col {
+  display: grid; grid-template-columns: 40% 1fr; gap: 24px; align-items: start;
+}
+.left-panel { position: sticky; top: 20px; }
+.right-panel { min-width: 0; }
+
+/* Condensed form inputs in left panel */
+.condensed-form .input-group label { font-size: 14px; font-weight: 600; }
+.condensed-form .input, .condensed-form select { padding: 8px 12px; font-size: 14px; }
+
+/* Condensed character card */
+.condensed-char {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; margin-bottom: 10px;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.condensed-char-name { font-size: 14px; font-weight: 600; }
+.condensed-char-sub { font-size: 11px; color: var(--text-muted); }
+.condensed-char-score {
+  margin-left: auto; font-size: 22px; font-weight: 700;
+  font-family: 'Chivo Mono', monospace; flex-shrink: 0;
 }
 
+/* Expandable filter sections */
+.expandable-header {
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text-secondary); padding: 4px 0; user-select: none;
+}
+.expandable-header:hover { color: var(--text-primary); }
+.expandable-icon {
+  font-size: 14px; font-weight: 700; width: 16px; text-align: center; color: var(--accent);
+}
+
+/* Path result rows (right panel) */
+.path-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px; border-radius: var(--radius-sm);
+  padding: 14px 16px; background: var(--bg-secondary);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.path-current {
+  display: flex; align-items: center; gap: 12px;
+  flex: 1; min-width: 0; padding: 0;
+}
+.path-current-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.path-dungeon-name {
+  font-weight: 600; font-size: 16px; color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.path-current-meta { display: flex; align-items: center; gap: 8px; }
+.path-key {
+  font-size: 17px; font-weight: 700;
+  font-family: 'Chivo Mono', monospace; color: var(--accent);
+}
+.path-stars { color: #fbbf24; font-size: 17px; }
+.path-score {
+  font-size: 16px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+}
+[data-theme="light"] .path-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+.path-thumb {
+  width: 40px; height: 40px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-input);
+}
+.path-arrow-col {
+  display: none;
+}
+.path-arrow-symbol { display: none; }
+.path-suggest {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0; background: transparent; min-width: auto;
+}
+.path-suggest-run { display: flex; align-items: center; gap: 6px; color: var(--text-primary); }
+.path-suggest-time {
+  font-size: 12px; color: var(--text-secondary); font-family: 'Chivo Mono', monospace;
+}
+.path-suggest-gain {
+  font-size: 18px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+  color: #4ade80;
+}
+
+@media (max-width: 900px) {
+  .app-two-col { grid-template-columns: 1fr; }
+  .left-panel { position: static; }
+}
 @media (max-width: 768px) {
   .search-grid { grid-template-columns: 1fr 1fr; }
   .target-row { grid-template-columns: 1fr; }
   .constraints-grid { grid-template-columns: 1fr; }
   .dungeon-checkboxes { grid-template-columns: 1fr; }
-  .path-summary { flex-wrap: wrap; }
   .header-inner { flex-wrap: wrap; gap: 12px; }
-  .dungeon-row { flex-wrap: wrap; }
-  .results-layout { grid-template-columns: 1fr; }
+  .path-row { flex-direction: column; }
+  .path-suggest { min-width: auto; }
+  .path-arrow-col {
+    padding: 4px 0; border-left: none; border-right: none;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
@@ -532,6 +623,7 @@ async function fetchBlizzardApi(url) {
   throw new Error('No API proxy available. Run the local server with: python server.py');
 }
 
+// Absolute thresholds for overall M+ rating display
 function getScoreColor(s) {
   if (s >= 2500) return '#ff8000';
   if (s >= 2000) return '#a335ee';
@@ -539,6 +631,54 @@ function getScoreColor(s) {
   if (s >= 1000) return '#1eff00';
   if (s >= 500) return '#ffffff';
   return '#9d9d9d';
+}
+
+function getClassColor(className) {
+  const classColors = {
+    'Death Knight': '#c41e3a',
+    'Demon Hunter': '#a335ee',
+    'Druid': '#ff7d0a',
+    'Evoker': '#33937f',
+    'Hunter': '#aad372',
+    'Mage': '#69ccf0',
+    'Monk': '#00ff98',
+    'Paladin': '#f58cba',
+    'Priest': '#c0c0c0',
+    'Rogue': '#fff569',
+    'Shaman': '#0070dd',
+    'Warlock': '#9482ca',
+    'Warrior': '#c79c6e',
+  };
+  return classColors[className] || '#a1a2a6';
+}
+
+// Rank-based 8-point color gradient for per-dungeon scores
+// Each unique score is assigned to one of 8 equally-spaced color stops
+function getDungeonScoreColor(score, allScores, scoreIndex) {
+  // User-provided colors for scores 1-8
+  const colorMap = {
+    1: 'rgb(28, 183, 61)',
+    2: 'rgb(12, 156, 176)',
+    3: 'rgb(70, 98, 247)',
+    4: 'rgb(124, 61, 255)',
+    5: 'rgb(184, 29, 227)',
+    6: 'rgb(213, 72, 177)',
+    7: 'rgb(242, 107, 98)',
+    8: 'rgb(225, 168, 23)',
+  };
+  if (score <= 0) return '#9d9d9d';
+  // If we have a scoreIndex (for path rows showing suggested score), use that
+  if (scoreIndex !== undefined && scoreIndex >= 1 && scoreIndex <= 8) {
+    return colorMap[scoreIndex];
+  }
+  // Otherwise, rank among unique scores and map to color index
+  const vals = allScores.filter(v => v > 0);
+  if (!vals.length) return '#9d9d9d';
+  const unique = [...new Set(vals)].sort((a, b) => a - b);
+  const rank = unique.indexOf(score);
+  if (rank === -1) return '#9d9d9d';
+  const colorIdx = Math.max(1, Math.min(8, unique.length <= 1 ? 4 : Math.round(rank / (unique.length - 1) * 7) + 1));
+  return colorMap[colorIdx];
 }
 
 // Build dungeon state from Blizzard API best_runs
@@ -592,14 +732,21 @@ function buildDungeonState(bestRuns, dungeonList) {
 
 function findPaths(ds, target, current, con, keys) {
   const diff = target - current;
-  if (diff <= 0) return { quickest: [], easiest: [], balanced: [] };
+  if (diff <= 0) return { quickest: [], easiest: [] };
   const cands = [];
   const dungeons = Object.values(ds).filter(d => !con.allowedDungeons?.length || con.allowedDungeons.includes(d.slug));
   const mk = con.maxKeyLevel || 30;
+  // Calculate character's max key level to limit star suggestions
+  const charMaxKey = Math.max(...dungeons.map(d => d.best.keyLevel || 0), 2);
   dungeons.forEach(d => {
     const cur = d.best;
-    for (let kl = Math.max(2, cur.keyLevel || 1); kl <= mk; kl++) {
-      for (let s = 1; s <= 3; s++) {
+    for (let kl = 2; kl <= mk; kl++) {
+      // Only suggest 3-star if 10+ levels below max, 2-star if 5+ levels below
+      const levelsBelow = charMaxKey - kl;
+      let maxStars = 1;
+      if (levelsBelow >= 10) maxStars = 3;
+      else if (levelsBelow >= 5) maxStars = 2;
+      for (let s = 1; s <= maxStars; s++) {
         const ns = calcRunScore(kl, s);
         if (ns <= cur.score) continue;
         const gain = Math.round((ns - cur.score) * 10) / 10;
@@ -616,15 +763,38 @@ function findPaths(ds, target, current, con, keys) {
   });
   let fc = cands;
   if (con.useKeystones && keys?.length) fc = cands.filter(c => keys.some(k => k.slug === c.slug && k.level === c.keyLevel));
-  return { quickest: greedyPath(fc, diff, 'eff'), easiest: greedyPath(fc, diff, 'easy'), balanced: greedyPath(fc, diff, 'bal') };
+  console.log('Total candidates generated:', fc.length);
+  console.log('Candidates by dungeon:', fc.reduce((acc, c) => {
+    if (!acc[c.slug]) acc[c.slug] = [];
+    acc[c.slug].push(`+${c.keyLevel}${c.stars > 1 ? '★'.repeat(c.stars) : '★'} = +${c.scoreGain}`);
+    return acc;
+  }, {}));
+  const quickest = greedyPath(fc, diff);
+  const quickestMaxKey = Math.max(...quickest.map(r => r.keyLevel), 0);
+  // Easiest: find the lowest max key level cap that can reach the target
+  let easiest = [];
+  for (let cap = 2; cap < quickestMaxKey; cap++) {
+    const capped = fc.filter(c => c.keyLevel <= cap);
+    const bestPerDungeon = {};
+    capped.forEach(c => {
+      if (!bestPerDungeon[c.slug] || c.scoreGain > bestPerDungeon[c.slug].scoreGain)
+        bestPerDungeon[c.slug] = c;
+    });
+    if (Object.values(bestPerDungeon).reduce((s, c) => s + c.scoreGain, 0) >= diff) {
+      easiest = greedyPath(capped, diff);
+      if (easiest.length) break;
+    }
+  }
+  if (!easiest.length) easiest = quickest;
+  return { quickest, easiest };
 }
 
-function greedyPath(cs, diff, strat) {
+function greedyPath(cs, diff) {
   if (!cs.length) return [];
-  let sorted;
-  if (strat === 'eff') sorted = [...cs].sort((a, b) => b.scoreGain - a.scoreGain || a.keyLevel - b.keyLevel);
-  else if (strat === 'easy') sorted = [...cs].sort((a, b) => a.keyLevel - b.keyLevel || b.scoreGain - a.scoreGain);
-  else sorted = [...cs].sort((a, b) => (b.scoreGain / (b.keyLevel || 1)) - (a.scoreGain / (a.keyLevel || 1)));
+
+  // Step 1: Pick dungeons by highest gain first (fewest runs needed)
+  // For easiest, candidates are already pre-filtered to lower key levels by the caller
+  const sorted = [...cs].sort((a, b) => b.scoreGain - a.scoreGain || a.keyLevel - b.keyLevel);
   const path = [], used = {};
   let rem = diff;
   for (const c of sorted) {
@@ -632,11 +802,39 @@ function greedyPath(cs, diff, strat) {
     if (used[c.slug]) continue;
     path.push({ ...c }); rem -= c.scoreGain; used[c.slug] = true;
   }
+  if (!path.length || rem > 0) return [];
+
+  // Step 2: Lower each dungeon to the minimum key level that still meets the target
+  const byDungeon = {};
+  cs.forEach(c => {
+    if (!used[c.slug]) return;
+    if (!byDungeon[c.slug]) byDungeon[c.slug] = [];
+    byDungeon[c.slug].push(c);
+  });
+  for (const slug of Object.keys(byDungeon)) {
+    byDungeon[slug].sort((a, b) => a.keyLevel - b.keyLevel || a.stars - b.stars);
+  }
+  let total = path.reduce((s, c) => s + c.scoreGain, 0);
+  for (let i = 0; i < path.length; i++) {
+    const options = byDungeon[path[i].slug];
+    if (!options) continue;
+    for (const opt of options) {
+      if (opt.keyLevel >= path[i].keyLevel) break;
+      if (total - path[i].scoreGain + opt.scoreGain >= diff) {
+        total = total - path[i].scoreGain + opt.scoreGain;
+        path[i] = { ...opt };
+        break;
+      }
+    }
+  }
+
   return path;
 }
 
 function saveToCookies(s) { try { document.cookie = `syrmplus_searches=${encodeURIComponent(JSON.stringify(s))}; expires=${new Date(Date.now()+7776e6).toUTCString()}; path=/; SameSite=Lax`; } catch(e){} }
 function loadFromCookies() { try { const m = document.cookie.match(/syrmplus_searches=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : []; } catch(e){ return []; } }
+function saveFormFieldsToCookies(charName, realm, region) { try { const data = { charName, realm, region }; document.cookie = `syrmplus_form=${encodeURIComponent(JSON.stringify(data))}; expires=${new Date(Date.now()+7776e6).toUTCString()}; path=/; SameSite=Lax`; } catch(e){} }
+function loadFormFieldsFromCookies() { try { const m = document.cookie.match(/syrmplus_form=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch(e){ return null; } }
 function clearCookies() { document.cookie = 'syrmplus_searches=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; }
 
 function RealmAutocomplete({ value, onChange, region, realmsData }) {
@@ -705,58 +903,48 @@ function ThemeToggle({ theme, onToggle }) {
   );
 }
 
-function StarBadge({ stars }) {
-  return <span className={`star-badge star-${stars}`}>{'★'.repeat(stars)}{'☆'.repeat(3-stars)}</span>;
-}
-
-function DungeonRunRow({ run, index }) {
+function PathRow({ dungeon, run, allScores, index }) {
   return (
-    <div className="dungeon-row fade-in" style={{ animationDelay: `${index*0.04}s` }}>
-      <img className="dungeon-thumb" src={run.icon} alt={run.dungeon}
-        onError={e => { if (!e.target.dataset.errored) { e.target.dataset.errored = 'true'; e.target.src = `https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(run.short||'?')}`; } }} />
-      <div className="dungeon-info">
-        <div className="dungeon-name">{run.dungeon} <span className="key-level-badge">+{run.keyLevel}</span></div>
-        <div className="dungeon-meta">
-          <StarBadge stars={run.stars} />
-          <span className="time-info">~{formatTime(run.estTime)} / {formatTime(run.timerLimit)}</span>
-        </div>
-        <div className="affix-badges" style={{ marginTop: 4 }}>
-          {(run.affixes||[]).map((a,i) => <span key={i} className="affix-badge">{a}</span>)}
+    <div className="path-row fade-in" style={{ animationDelay: `${index*0.04}s` }}>
+      <div className="path-current">
+        <img className="path-thumb" src={dungeon.icon} alt={dungeon.name}
+          onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/40x40/2c2d33/5b9cf5?text=${encodeURIComponent(dungeon.short||'?')}`;}}}/>
+        <div className="path-current-info">
+          <div className="path-dungeon-name">{dungeon.name}</div>
         </div>
       </div>
-      <div className="dungeon-score-col">
-        <div className="dungeon-score score-delta">+{run.scoreGain}</div>
-        <div className="dungeon-score-label">score gain</div>
+      <div className="path-arrow-col">
+        <span className="path-arrow-symbol">→</span>
+      </div>
+      <div className="path-suggest">
+        <div className="path-suggest-run">
+          <span className="path-key">+{run.keyLevel}</span>
+          {run.stars > 0 && <span className="path-stars">{'★'.repeat(run.stars)}</span>}
+        </div>
+        <span className="path-suggest-time">~{formatTime(run.estTime)} / {formatTime(run.timerLimit)}</span>
+        <div className="path-suggest-gain">+{Math.round(run.scoreGain)}</div>
       </div>
     </div>
   );
 }
 
-function PathResults({ path, label, desc }) {
-  if (!path?.length) return (
-    <div className="card" style={{ marginBottom:16, textAlign:'center', padding:32 }}>
-      <div style={{ color:'var(--text-muted)', fontSize:14 }}>No path found. Try adjusting filters.</div>
-    </div>
-  );
-  const tg = path.reduce((s,r) => s+r.scoreGain, 0);
-  const tt = path.reduce((s,r) => s+r.estTime, 0);
-  const ak = (path.reduce((s,r) => s+r.keyLevel, 0)/path.length).toFixed(1);
+function CompactDungeonRow({ dungeon, allScores, index }) {
   return (
-    <div className="card fade-in" style={{ marginBottom:16 }}>
-      <div style={{ marginBottom:16 }}>
-        <div style={{ fontSize:15, fontWeight:600, marginBottom:4 }}>{label}</div>
-        <div style={{ fontSize:12, color:'var(--text-muted)' }}>{desc}</div>
+    <div className="compact-dungeon-row fade-in" style={{animationDelay:`${index*0.03}s`}}>
+      <img className="compact-dungeon-thumb" src={dungeon.icon} alt={dungeon.name}
+        onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/36x36/2c2d33/5b9cf5?text=${encodeURIComponent(dungeon.short)}`;}}}/>
+      <div className="compact-dungeon-info">
+        <span className="compact-dungeon-name">{dungeon.name}</span>
+        {dungeon.best.keyLevel > 0 ? (
+          <div className="compact-dungeon-meta">
+            <span className="compact-key-level">+{dungeon.best.keyLevel}</span>
+            {dungeon.best.stars > 0 && <span className="compact-stars">{'★'.repeat(dungeon.best.stars)}</span>}
+          </div>
+        ) : (
+          <span style={{color:'var(--text-muted)',fontSize:11}}>—</span>
+        )}
       </div>
-      <div className="path-summary">
-        <div className="path-stat"><div className="path-stat-value">+{tg}</div><div className="path-stat-label">Total Gain</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">{path.length}</div><div className="path-stat-label">Dungeons</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">~{formatTime(tt)}</div><div className="path-stat-label">Est. Time</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">+{ak}</div><div className="path-stat-label">Avg Key</div></div>
-      </div>
-      {path.map((r,i) => <DungeonRunRow key={i} run={r} index={i} />)}
+      <span className="compact-score" style={{color:getDungeonScoreColor(dungeon.totalScore, allScores)}}>{dungeon.totalScore.toFixed(1)}</span>
     </div>
   );
 }
@@ -800,13 +988,31 @@ function App() {
   const [savedSearches, setSavedSearches] = useState([]);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
-  const [showConstraints, setShowConstraints] = useState(false);
+  const [showDungeonFilter, setShowDungeonFilter] = useState(false);
+  const [showKeystoneSection, setShowKeystoneSection] = useState(false);
   const [realmsData, setRealmsData] = useState({ us:[], eu:[], kr:[], tw:[] });
   const [realmsLoading, setRealmsLoading] = useState(true);
   const [dungeonList, setDungeonList] = useState(FALLBACK_DUNGEONS);
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => { document.body.setAttribute('data-theme', theme); }, [theme]);
-  useEffect(() => { setSavedSearches(loadFromCookies()); }, []);
+  useEffect(() => { 
+    setSavedSearches(loadFromCookies()); 
+    const formFields = loadFormFieldsFromCookies();
+    if (formFields) {
+      setCharName(formFields.charName || '');
+      setRealm(formFields.realm || '');
+      setRegion(formFields.region || 'us');
+    }
+    hasInitializedRef.current = true;
+  }, []);
+
+  // Auto-save character when a successful lookup occurs
+  useEffect(() => {
+    if (hasInitializedRef.current && charData && !loading) {
+      autoSaveCharacter();
+    }
+  }, [charData]);
 
   // Fetch realm lists and current season dungeons from Blizzard API on mount
   useEffect(() => {
@@ -962,13 +1168,64 @@ function App() {
     setError('');
     const con = { allowedDungeons:allowedDungeons.length?allowedDungeons:null, maxKeyLevel:maxKeyLevel?parseInt(maxKeyLevel):null, useKeystones:advancedMode };
     const ks = advancedMode ? keystones.filter(k=>k.slug&&k.level).map(k=>({slug:k.slug,level:parseInt(k.level)})) : null;
-    setResults(findPaths(dungeonState, t, c, con, ks));
+    const r = findPaths(dungeonState, t, c, con, ks);
+    setResults(r);
     setActiveTab('quickest');
+    const totalGain = (r.quickest||[]).reduce((s,x) => s + x.scoreGain, 0);
+    if (totalGain < t - c) {
+      setError('Your current filters cannot reach the target score. Try raising the max key level or enabling more dungeons.');
+    }
+  }
+
+  async function handleSubmit() {
+    const charChanged = charData && (charName.trim().toLowerCase() !== charData.name.toLowerCase() || realm.trim().toLowerCase() !== charData.realm.toLowerCase());
+    if (charChanged) {
+      await lookupCharacter();
+    } else if (!dungeonState) {
+      await lookupCharacter();
+    } else {
+      calculatePaths();
+    }
   }
 
   function saveSearch() {
-    const s = { id:Date.now(), charName:charName.trim(), realm:realm.trim(), region, targetScore, allowedDungeons:[...allowedDungeons], maxKeyLevel, advancedMode, keystones:advancedMode?[...keystones]:[], savedAt:new Date().toISOString() };
-    const u = [s,...savedSearches].slice(0,10); setSavedSearches(u); saveToCookies(u);
+    const newSearch = { id:Date.now(), charName:charName.trim(), realm:realm.trim(), region, targetScore, allowedDungeons:[...allowedDungeons], maxKeyLevel, advancedMode, keystones:advancedMode?[...keystones]:[], savedAt:new Date().toISOString() };
+    // Check if this search already exists
+    const isDuplicate = savedSearches.some(s => 
+      s.charName === newSearch.charName && 
+      s.realm === newSearch.realm && 
+      s.region === newSearch.region && 
+      s.targetScore === newSearch.targetScore && 
+      JSON.stringify(s.allowedDungeons) === JSON.stringify(newSearch.allowedDungeons) &&
+      s.maxKeyLevel === newSearch.maxKeyLevel &&
+      s.advancedMode === newSearch.advancedMode
+    );
+    if (isDuplicate) { setError('This search has already been saved.'); return; }
+    const u = [newSearch,...savedSearches].slice(0,10); setSavedSearches(u); saveToCookies(u);
+  }
+
+  function autoSaveCharacter() {
+    const charNameTrim = charName.trim();
+    const realmTrim = realm.trim();
+    // Check if this character already exists in saved searches - if so, remove the old one
+    const existingIndex = savedSearches.findIndex(s => 
+      s.charName === charNameTrim && 
+      s.realm === realmTrim && 
+      s.region === region
+    );
+    let updatedSearches;
+    if (existingIndex !== -1) {
+      // Replace the existing entry
+      updatedSearches = [...savedSearches];
+      updatedSearches.splice(existingIndex, 1);
+      updatedSearches = [{ id:Date.now(), charName:charNameTrim, realm:realmTrim, region, targetScore:'', allowedDungeons:[], maxKeyLevel:'', advancedMode:false, keystones:[], savedAt:new Date().toISOString() }, ...updatedSearches];
+    } else {
+      // Add new entry
+      updatedSearches = [{ id:Date.now(), charName:charNameTrim, realm:realmTrim, region, targetScore:'', allowedDungeons:[], maxKeyLevel:'', advancedMode:false, keystones:[], savedAt:new Date().toISOString() }, ...savedSearches].slice(0,10);
+    }
+    setSavedSearches(updatedSearches);
+    saveToCookies(updatedSearches);
+    saveFormFieldsToCookies(charNameTrim, realmTrim, region);
   }
   function loadSearch(s) {
     setCharName(s.charName); setRealm(s.realm); setRegion(s.region);
@@ -989,6 +1246,9 @@ function App() {
     return s.replace(/-/g,' ').replace('season tww ','TWW Season ').replace('season df ','DF Season ').replace('season ','Season ').replace(/\b\w/g,c=>c.toUpperCase());
   };
 
+  const allScores = dungeonState ? Object.values(dungeonState).map(d => d.totalScore) : [];
+  const sortedDungeons = dungeonState ? Object.values(dungeonState).sort((a, b) => a.totalScore - b.totalScore) : [];
+
   return (
     <div>
       <header className="header">
@@ -998,172 +1258,219 @@ function App() {
             <h1><span>Syr's</span> M+ Score Goal Helper</h1>
           </div>
           <div className="header-actions">
-            <button className="btn btn-ghost btn-sm" onClick={()=>setShowSaved(!showSaved)}>📋 Saved ({savedSearches.length})</button>
+            <div style={{position:'relative'}}>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setShowSaved(!showSaved)}>📋 Saved ({savedSearches.length})</button>
+              {showSaved && (
+                <div style={{position:'absolute',top:'100%',right:0,background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',marginTop:4,minWidth:300,maxHeight:400,overflowY:'auto',boxShadow:'var(--shadow)',zIndex:100}}>
+                  {savedSearches.length === 0 ? (
+                    <div style={{padding:16,textAlign:'center',color:'var(--text-muted)',fontSize:13}}>No saved searches yet.</div>
+                  ) : (
+                    <div className="saved-list" style={{padding:8}}>
+                      {savedSearches.map(s=>(
+                        <div key={s.id} className="saved-item" style={{marginBottom:4}} onClick={()=>{loadSearch(s);setShowSaved(false);}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div className="saved-item-name">{s.charName} — {s.realm}</div>
+                            <div className="saved-item-meta">Target: {s.targetScore||'—'} · {s.region.toUpperCase()}</div>
+                          </div>
+                          <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();deleteSaved(s.id);}} style={{padding:'2px 6px'}}>✕</button>
+                        </div>
+                      ))}
+                      {savedSearches.length>0&&<button className="btn btn-danger btn-sm" onClick={clearAllSaved} style={{width:'100%',marginTop:8}}>Clear All</button>}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
       </header>
       <main className="container">
-        <div className="section">
-          <div className="card">
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-              <div className="section-title" style={{ margin:0 }}><div className="dot" /> Character Lookup</div>
-              {seasonName && <div className="season-badge">🏰 {formatSeasonName(seasonName)}</div>}
-            </div>
-            <div className="search-grid">
-              <div className="input-group">
-                <label>Character Name</label>
-                <input className="input" placeholder="e.g. Syrsjr" value={charName}
-                  onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
-              </div>
-              <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
-              <div className="input-group">
-                <label>Region</label>
-                <select value={region} onChange={e=>setRegion(e.target.value)}>
-                  {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
-                </select>
-              </div>
-              <button className="btn btn-primary" onClick={lookupCharacter} disabled={loading} style={{alignSelf:'end'}}>
-                {loading?'...':'Look Up'}
-              </button>
-            </div>
-            {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Blizzard API...</div>}
-            {charData && (
-              <div className="target-row">
-                <div className="input-group">
-                  <label>Target M+ Score</label>
-                  <input className="input mono" type="number" placeholder="e.g. 2500" value={targetScore} onChange={e=>setTargetScore(e.target.value)} />
+        {/* PRE-LOOKUP: centered search card */}
+        {!charData && (
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
+            <div className="section">
+              <div className="card">
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+                  <div className="section-title" style={{margin:0}}><div className="dot" /> Character Lookup</div>
+                  {seasonName && <div className="season-badge">🏰 {formatSeasonName(seasonName)}</div>}
                 </div>
-                <div style={{ display:'flex', gap:8, alignItems:'flex-end', flexWrap:'wrap' }}>
-                  <button className="btn btn-primary" onClick={calculatePaths} disabled={!targetScore}>Calculate Paths</button>
-                  <button className="btn btn-secondary" onClick={saveSearch}>💾 Save</button>
-                  <button className="btn btn-ghost btn-sm" onClick={()=>setShowConstraints(!showConstraints)}>
-                    ⚙️ {showConstraints?'Hide':'Filters'}
-                  </button>
-                </div>
-              </div>
-            )}
-            {showConstraints && charData && (
-              <div style={{ marginTop:20, paddingTop:16, borderTop:'1px solid var(--border)' }}>
-                <div className="constraints-grid">
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:500, color:'var(--text-secondary)', marginBottom:8 }}>
-                      Limit to Dungeons <span style={{ fontSize:11, color:'var(--text-muted)' }}>(leave unchecked for all)</span>
-                    </div>
-                    <div className="dungeon-checkboxes">
-                      {dungeonList.map(d=>(
-                        <label key={d.slug} className="checkbox-label">
-                          <input type="checkbox" checked={allowedDungeons.includes(d.slug)} onChange={()=>toggleDungeon(d.slug)} />
-                          {d.short||d.name}
-                        </label>
-                      ))}
-                    </div>
+                <div className="search-grid full-width" style={{gridTemplateColumns:'60px 1fr 1fr'}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Region</label>
+                    <select value={region} onChange={e=>setRegion(e.target.value)} style={{fontSize:'14px',padding:'8px 12px'}}>
+                      {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
                   </div>
-                  <div>
-                    <div className="input-group">
-                      <label>Max Key Level</label>
-                      <input className="input mono" type="number" placeholder="No limit" value={maxKeyLevel} onChange={e=>setMaxKeyLevel(e.target.value)} min="2" max="40" />
-                    </div>
-                    <div className="toggle-row">
-                      <input type="checkbox" checked={advancedMode} onChange={e=>setAdvancedMode(e.target.checked)} style={{accentColor:'var(--accent)'}} />
-                      <span className="toggle-label">Advanced: Use Group Keystones</span>
-                    </div>
-                    {advancedMode && (
-                      <div style={{marginTop:12}}>
-                        <div style={{fontSize:12,color:'var(--text-muted)',marginBottom:8}}>Enter your group's available keystones:</div>
-                        {keystones.map((k,i)=>(
-                          <div key={i} className="keystone-grid">
-                            <select value={k.slug} onChange={e=>updateKeystone(i,'slug',e.target.value)}>
-                              <option value="">Select dungeon...</option>
-                              {dungeonList.map(d=><option key={d.slug} value={d.slug}>{d.short||d.name}</option>)}
-                            </select>
-                            <input className="input mono" type="number" placeholder="+Lvl" value={k.level} onChange={e=>updateKeystone(i,'level',e.target.value)} min="2" max="40" />
-                            <button className="btn btn-ghost btn-sm" onClick={()=>removeKeystone(i)}>✕</button>
-                          </div>
-                        ))}
-                        <button className="btn btn-secondary btn-sm" onClick={addKeystone} style={{marginTop:4}}>+ Add Key</button>
-                      </div>
-                    )}
+                  <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Character Name</label>
+                    <input className="input" placeholder="e.g. Syrsjr" value={charName}
+                      onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-        {error && <div className="error-msg" style={{marginBottom:24}}>{error}</div>}
-        {loading && <div className="loading-spinner" />}
-        {charData && !loading && (
-          <div className="section fade-in">
-            <div className="card current-score-card">
-              {av && <img className="avatar" src={av} alt="avatar" onError={e=>{e.target.style.display='none';}} />}
-              <div className="char-details">
-                <div className="char-name">{charData.name}</div>
-                <div className="char-realm">{charData.realm} — {charData.region?.toUpperCase()}</div>
-                <div className="char-class">
-                  {charData.active_spec_name} {charData.class}
-                  {charData.gear?.item_level_equipped?` • ${charData.gear.item_level_equipped} ilvl`:''}
-                </div>
-              </div>
-              <div className="current-score-display">
-                <div className="current-score-num" style={{color:getScoreColor(cs)}}>{cs.toFixed(1)}</div>
-                <div className="current-score-label">Current M+ Score</div>
+                <button className="btn btn-lookup" onClick={lookupCharacter} disabled={loading} style={{width:'100%',marginTop:12}}>
+                  {loading?'...':'Look Up'}
+                </button>
+                {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Blizzard API...</div>}
               </div>
             </div>
+            {loading && <div className="loading-spinner" />}
+            {error && <div className="error-msg" style={{marginTop:16}}>{error}</div>}
           </div>
         )}
-        {charData && !loading && (
-          <div className="results-layout">
-            <div className="results-main">
-              {results ? (
-                <div className="section fade-in">
-                  <div className="section-title"><div className="dot" /> Paths to {targetScore} Score</div>
-                  <div style={{marginBottom:4,fontSize:13,color:'var(--text-muted)'}}>
-                    Need <strong style={{color:'var(--success)'}}>+{(parseInt(targetScore)-cs).toFixed(0)}</strong> more score
+
+        {/* POST-LOOKUP: two-column layout */}
+        {charData && (
+          <div className="app-two-col">
+            {/* LEFT PANEL: search, filters */}
+            <div className="left-panel">
+              <div className="card condensed-form" style={{padding:16,marginBottom:12}}>
+                <div style={{display:'grid',gridTemplateColumns:'60px 1fr 1fr',gap:6,marginBottom:10}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Region</label>
+                    <select value={region} onChange={e=>setRegion(e.target.value)} style={{fontSize:'14px',padding:'8px 12px'}}>
+                      {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
                   </div>
-                  <div className="tabs">
-                    <button className={`tab ${activeTab==='quickest'?'active':''}`} onClick={()=>setActiveTab('quickest')}>⚡ Quickest</button>
-                    <button className={`tab ${activeTab==='balanced'?'active':''}`} onClick={()=>setActiveTab('balanced')}>⚖️ Balanced</button>
-                    <button className={`tab ${activeTab==='easiest'?'active':''}`} onClick={()=>setActiveTab('easiest')}>🌿 Easiest</button>
+                  <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Character</label>
+                    <input className="input" placeholder="Name" value={charName}
+                      onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
                   </div>
-                  {activeTab==='quickest'&&<PathResults path={results.quickest} label="⚡ Quickest Path" desc="Fewest runs — max score gain per dungeon" />}
-                  {activeTab==='balanced'&&<PathResults path={results.balanced} label="⚖️ Balanced Path" desc="Best score gain to key difficulty ratio" />}
-                  {activeTab==='easiest'&&<PathResults path={results.easiest} label="🌿 Easiest Path" desc="Lowest keys possible — may need more runs" />}
                 </div>
-              ) : (
-                <div className="card" style={{textAlign:'center',padding:32,color:'var(--text-muted)',fontSize:14}}>
-                  Set a target score above and click "Calculate Paths" to see recommendations.
+
+                {/* Target score field */}
+                <div className="input-group" style={{marginBottom:8}}>
+                  <label>Target M+ Score</label>
+                  <input className="input mono" type="number" step="1" placeholder="e.g. 2500" value={targetScore}
+                    onChange={e=>setTargetScore(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} />
+                </div>
+
+                {/* Max key level - always visible */}
+                <div className="input-group" style={{marginBottom:6}}>
+                  <label>Max Key Level</label>
+                  <input className="input mono" type="number" step="1" placeholder="No limit" value={maxKeyLevel}
+                    onChange={e=>setMaxKeyLevel(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} min="2" max="30" />
+                </div>
+
+                {/* Expandable: Limit to Dungeons */}
+                <div className="expandable-header" onClick={()=>setShowDungeonFilter(!showDungeonFilter)}>
+                  <span className="expandable-icon">{showDungeonFilter?'−':'+'}</span>
+                  <span>Limit to Dungeons</span>
+                </div>
+                {showDungeonFilter && (
+                  <div className="dungeon-checkboxes" style={{gridTemplateColumns:'1fr',marginBottom:4,paddingLeft:22}}>
+                    {dungeonList.map(d=>(
+                      <label key={d.slug} className="checkbox-label" style={{fontSize:14}}>
+                        <input type="checkbox" checked={allowedDungeons.includes(d.slug)} onChange={()=>toggleDungeon(d.slug)} />
+                        {d.name}
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {/* Expandable: Restrict to specific keystones */}
+                <div className="expandable-header" onClick={()=>{setShowKeystoneSection(!showKeystoneSection); setAdvancedMode(!showKeystoneSection);}}>
+                  <span className="expandable-icon">{showKeystoneSection?'−':'+'}</span>
+                  <span>Restrict to specific keystones</span>
+                </div>
+                {showKeystoneSection && (
+                  <div style={{paddingLeft:22,marginBottom:4}}>
+                    {keystones.map((k,i)=>(
+                      <div key={i} style={{display:'flex',gap:4,marginBottom:4,alignItems:'center'}}>
+                        <select value={k.slug} onChange={e=>updateKeystone(i,'slug',e.target.value)} style={{flex:1,fontSize:14,padding:'6px 8px'}}>
+                          <option value="">Dungeon...</option>
+                          {dungeonList.map(d=><option key={d.slug} value={d.slug}>{d.name}</option>)}
+                        </select>
+                        <input className="input mono" type="number" step="1" placeholder="+Lvl" value={k.level}
+                          onChange={e=>updateKeystone(i,'level',e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}}
+                          min="2" max="30" style={{width:50,fontSize:14,padding:'6px 8px'}} />
+                        <button className="btn btn-ghost btn-sm" onClick={()=>removeKeystone(i)} style={{padding:'2px 6px',fontSize:12}}>✕</button>
+                      </div>
+                    ))}
+                    <button className="btn btn-secondary btn-sm" onClick={addKeystone} style={{fontSize:11,padding:'4px 10px',marginTop:2}}>+ Add Key</button>
+                  </div>
+                )}
+
+                {/* Submit button at the very bottom */}
+                <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={!targetScore || !charName.trim() || !realm.trim()} style={{flex:1,width:'100%',marginTop:16}}>
+                  Submit
+                </button>
+              </div>
+
+              {/* Character info and current dungeon scores - merged card */}
+              {charData && dungeonState && (
+                <div className="card" style={{padding:16}}>
+                  {/* Character banner - no separate box */}
+                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                    {av && <img src={av} alt="avatar" style={{width:48,height:48,borderRadius:8,border:'2px solid var(--accent)',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}} />}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:16,fontWeight:700,color:'var(--text-primary)',marginBottom:2}}>{charData.name}</div>
+                      <div style={{fontSize:12,color:'var(--text-muted)',marginBottom:2}}>{charData.realm} — {charData.region?.toUpperCase()}</div>
+                      <div style={{fontSize:12,color:'var(--text-secondary)',display:'flex',gap:0}}>
+                        <span style={{color:getClassColor(charData.class)}}>{charData.active_spec_name} {charData.class}</span>
+                      </div>
+                    </div>
+                    <div style={{textAlign:'right',flexShrink:0}}>
+                      <div style={{fontSize:24,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono', monospace"}}>{cs.toFixed(1)}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Current dungeon scores */}
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:6}}>Current Scores</div>
+                  {sortedDungeons.map((d,i)=>(
+                    <CompactDungeonRow key={d.slug} dungeon={d} allScores={allScores} index={i} />
+                  ))}
                 </div>
               )}
             </div>
-            {dungeonState && (
-              <div className="results-sidebar">
-                <div className="section-title" style={{marginBottom:8}}><div className="dot" /> Current Scores</div>
-                {Object.values(dungeonState).map((d,i)=>(
-                  <div key={d.slug} className="compact-dungeon-row fade-in" style={{animationDelay:`${i*0.03}s`}}>
-                    <img className="compact-dungeon-thumb" src={d.icon} alt={d.name}
-                      onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/36x36/2c2d33/5b9cf5?text=${encodeURIComponent(d.short)}`;}}}/>
-                    <div className="compact-dungeon-info">
-                      <span className="compact-dungeon-name">{d.name}</span>
-                      <div className="compact-dungeon-meta">
-                        {d.best.keyLevel>0 ? (
-                          <React.Fragment>
-                            <span className="compact-key-level">+{d.best.keyLevel}</span>
-                            {d.best.stars>0&&<span className="compact-stars">{'★'.repeat(d.best.stars)}</span>}
-                          </React.Fragment>
-                        ) : (
-                          <span style={{color:'var(--text-muted)',fontSize:11}}>—</span>
-                        )}
+
+            {/* RIGHT PANEL: path results */}
+            <div className="right-panel">
+              {loading && <div className="loading-spinner" />}
+              {error && <div className="error-msg" style={{marginBottom:16}}>{error}</div>}
+              {results && !error.includes('cannot reach the target score') ? (() => {
+                const currentPath = results[activeTab] || results.quickest || [];
+                const sortedPath = [...currentPath].sort((a,b) => b.scoreGain - a.scoreGain);
+                return (
+                  <div className="section fade-in">
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+                      <div className="section-title" style={{margin:0}}><div className="dot" /> Path to {targetScore}</div>
+                      <div style={{fontSize:13,color:'var(--text-secondary)'}}>
+                        Need <strong style={{color:'var(--success)'}}>+{(parseInt(targetScore)-cs).toFixed(0)}</strong> more
                       </div>
                     </div>
-                    <span className="compact-score" style={{color:getScoreColor(d.totalScore*8)}}>{d.totalScore}</span>
+                    <div className="tabs" style={{marginBottom:16}}>
+                      <button className={`tab ${activeTab==='quickest'?'active':''}`} onClick={()=>setActiveTab('quickest')}>⚡ Quickest</button>
+                      <button className={`tab ${activeTab==='easiest'?'active':''}`} onClick={()=>setActiveTab('easiest')}>🌿 Easiest</button>
+                    </div>
+                    {sortedPath.length > 0 ? (
+                      sortedPath.map((run,i) => {
+                        const dungeon = dungeonState[run.slug];
+                        if (!dungeon) return null;
+                        return <PathRow key={run.slug} dungeon={dungeon} run={run} allScores={allScores} index={i} />;
+                      })
+                    ) : (
+                      <div className="card" style={{textAlign:'center',padding:32,color:'var(--text-muted)',fontSize:14}}>
+                        No path found. Try adjusting filters.
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })() : (
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:200,color:'var(--text-muted)',fontSize:14}}>
+                  Enter a target score and click Calculate to see suggested paths.
+                </div>
+              )}
+            </div>
           </div>
         )}
-        {showSaved && (
-          <div className="section fade-in">
+
+        {/* Saved searches */}
+        {showSaved && !charData && (
+          <div style={{maxWidth:600,margin:'24px auto 0'}}>
             <div className="card">
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
                 <div className="section-title" style={{margin:0}}><div className="dot" /> Saved Searches</div>
@@ -1177,7 +1484,7 @@ function App() {
                     <div key={s.id} className="saved-item" onClick={()=>loadSearch(s)}>
                       <div>
                         <div className="saved-item-name">{s.charName} — {s.realm} ({s.region.toUpperCase()})</div>
-                        <div className="saved-item-meta">Target: {s.targetScore||'—'} • {new Date(s.savedAt).toLocaleDateString()}</div>
+                        <div className="saved-item-meta">Target: {s.targetScore||'—'} · {new Date(s.savedAt).toLocaleDateString()}</div>
                       </div>
                       <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();deleteSaved(s.id);}}>✕</button>
                     </div>
@@ -1189,7 +1496,7 @@ function App() {
         )}
       </main>
       <footer className="footer">
-        <p>Syr's M+ Score Goal Helper — Data from <a href="https://develop.battle.net/" target="_blank" rel="noopener noreferrer">Blizzard WoW API</a> • <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
+        <p>Syr's M+ Score Goal Helper — Data from <a href="https://develop.battle.net/" target="_blank" rel="noopener noreferrer">Blizzard WoW API</a> · <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
         <p style={{marginTop:4}}>Score calculations are approximate. Dungeon list and season update automatically from the API.</p>
       </footer>
       {showPrivacy && <PrivacyModal onClose={()=>setShowPrivacy(false)} />}
