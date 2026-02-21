@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Syr's M+ Score Goal Helper</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Chivo+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg-primary: #1a1b1e;
@@ -55,12 +55,16 @@ body {
   min-height: 100vh;
   transition: background var(--transition), color var(--transition);
 }
-.mono { font-family: 'JetBrains Mono', monospace; }
+.mono { font-family: 'Chivo Mono', monospace; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-.header { padding: 24px 0; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+.header { padding: 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px; max-height: 60px; }
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; }
 .logo { display: flex; align-items: center; gap: 12px; }
 .logo-icon {
@@ -95,13 +99,15 @@ body {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); }
 .btn-secondary:hover { background: var(--bg-hover); }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn-lookup { background: #5a8fd4; color: #fff; }
+.btn-lookup:hover { background: #4a7ebd; }
+.btn-sm { padding: 6px 14px; font-size: 16px; }
 .btn-ghost { background: transparent; color: var(--text-secondary); padding: 6px 10px; }
 .btn-ghost:hover { color: var(--text-primary); background: var(--bg-hover); }
 .btn-danger { background: transparent; color: var(--danger); }
 .btn-danger:hover { background: rgba(248,113,113,0.1); }
 .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
-.input-group label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.input-group label { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
 .input, select {
   padding: 10px 14px; border-radius: var(--radius-sm);
   background: var(--bg-input); border: 1px solid var(--border);
@@ -131,14 +137,16 @@ select {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 24px; transition: all var(--transition);
 }
-.search-grid { display: grid; grid-template-columns: 1fr 1fr 140px 120px; gap: 12px; align-items: end; }
+.search-grid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: end; }
+.search-grid.full-width { grid-template-columns: 1fr; }
+.search-grid.two-col { grid-template-columns: 1fr 1fr 140px 120px; }
 .target-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: end; margin-top: 16px; }
 .tabs { display: flex; gap: 4px; margin-bottom: 24px; }
 .tab {
   padding: 10px 20px; border-radius: var(--radius-sm);
-  background: transparent; color: var(--text-secondary);
+  background: var(--bg-input); color: var(--text-secondary);
   font-family: 'Outfit', sans-serif; font-weight: 500;
-  font-size: 14px; border: none; cursor: pointer; transition: all var(--transition);
+  font-size: 14px; border: 1px solid var(--border); cursor: pointer; transition: all var(--transition);
 }
 .tab:hover { color: var(--text-primary); background: var(--bg-hover); }
 .tab.active { background: var(--accent); color: #fff; }
@@ -157,8 +165,9 @@ select {
 .dungeon-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
 .dungeon-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dungeon-score-col { text-align: right; min-width: 80px; }
-.dungeon-score { font-size: 20px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-.dungeon-score-label { font-size: 11px; color: var(--text-muted); }
+.dungeon-score { font-size: 20px; font-weight: 700; font-family: 'Chivo Mono', monospace; }
+[data-theme="light"] .dungeon-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+.dungeon-score-label { font-size: 11px; color: var(--text-secondary); }
 .star-badge {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
@@ -169,14 +178,14 @@ select {
 .key-level-badge {
   display: inline-flex; padding: 2px 8px; border-radius: 10px;
   font-size: 12px; font-weight: 600; background: var(--accent-dim); color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Chivo Mono', monospace;
 }
 .affix-badges { display: flex; gap: 4px; flex-wrap: wrap; }
 .affix-badge {
   padding: 1px 6px; border-radius: 4px; font-size: 10px;
   background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border);
 }
-.time-info { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.time-info { font-size: 12px; color: var(--text-secondary); font-family: 'Chivo Mono', monospace; }
 .constraints-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
 .dungeon-checkboxes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
 .checkbox-label {
@@ -194,7 +203,7 @@ select {
   border: 1px solid rgba(91,156,245,0.2);
 }
 .path-stat { text-align: center; }
-.path-stat-value { font-size: 24px; font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+.path-stat-value { font-size: 24px; font-weight: 700; color: var(--accent); font-family: 'Chivo Mono', monospace; }
 .path-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .path-divider { width: 1px; height: 40px; background: var(--border); }
 .score-delta { color: var(--success); }
@@ -243,7 +252,7 @@ select {
 .char-class { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
 .current-score-display { text-align: right; }
 .current-score-num {
-  font-size: 36px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  font-size: 36px; font-weight: 700; font-family: 'Chivo Mono', monospace;
   background: linear-gradient(135deg, var(--accent), #8b5cf6);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
@@ -262,19 +271,155 @@ select {
   background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(91,156,245,0.2);
 }
 .footer {
-  margin-top: 48px; padding: 24px 0; border-top: 1px solid var(--border);
+  max-width: 1400px; margin: 48px auto 0; padding: 24px 20px;
+  border-top: 1px solid var(--border);
   text-align: center; font-size: 12px; color: var(--text-muted);
 }
 .footer a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .footer a:hover { text-decoration: underline; }
+/* Compact dungeon rows for left panel */
+.compact-dungeon-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 10px; border-radius: var(--radius-sm);
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  margin-bottom: 2px; transition: all var(--transition);
+}
+.compact-dungeon-thumb {
+  width: 36px; height: 36px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-input);
+}
+.compact-dungeon-info {
+  flex: 1; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 6px;
+}
+.compact-dungeon-name {
+  font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.compact-dungeon-meta { display: flex; align-items: center; gap: 4px; }
+.compact-key-level {
+  font-size: 14px; font-weight: 700; font-family: 'Chivo Mono', monospace; color: var(--accent);
+  flex-shrink: 0;
+}
+.compact-stars { color: #fbbf24; font-size: 14px; letter-spacing: 0px; flex-shrink: 0; }
+.compact-score {
+  font-size: 15px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+  text-align: right; min-width: 50px; flex-shrink: 0;
+}
+[data-theme="light"] .compact-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+
+/* Two-column app layout (40/60 split) */
+.app-two-col {
+  display: grid; grid-template-columns: 40% 1fr; gap: 24px; align-items: start;
+}
+.left-panel { position: sticky; top: 20px; }
+.right-panel { min-width: 0; }
+
+/* Condensed form inputs in left panel */
+.condensed-form .input-group label { font-size: 14px; font-weight: 600; }
+.condensed-form .input, .condensed-form select { padding: 8px 12px; font-size: 14px; }
+
+/* Condensed character card */
+.condensed-char {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; margin-bottom: 10px;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.condensed-char-name { font-size: 14px; font-weight: 600; }
+.condensed-char-sub { font-size: 11px; color: var(--text-muted); }
+.condensed-char-score {
+  margin-left: auto; font-size: 22px; font-weight: 700;
+  font-family: 'Chivo Mono', monospace; flex-shrink: 0;
+}
+
+/* Expandable filter sections */
+.expandable-header {
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text-secondary); padding: 4px 0; user-select: none;
+}
+.expandable-header:hover { color: var(--text-primary); }
+.expandable-icon {
+  font-size: 14px; font-weight: 700; width: 16px; text-align: center; color: var(--accent);
+}
+
+/* Path result rows (right panel) */
+.path-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px; border-radius: var(--radius-sm);
+  padding: 14px 16px; background: var(--bg-secondary);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.path-current {
+  display: flex; align-items: center; gap: 12px;
+  flex: 1; min-width: 0; padding: 0;
+}
+.path-current-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.path-dungeon-name {
+  font-weight: 600; font-size: 16px; color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.path-current-meta { display: flex; align-items: center; gap: 8px; }
+.path-key {
+  font-size: 17px; font-weight: 700;
+  font-family: 'Chivo Mono', monospace; color: var(--accent);
+}
+.path-stars { color: #fbbf24; font-size: 17px; }
+.path-score {
+  font-size: 16px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+}
+[data-theme="light"] .path-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+.path-thumb {
+  width: 40px; height: 40px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-input);
+}
+.path-arrow-col {
+  display: none;
+}
+.path-arrow-symbol { display: none; }
+.path-suggest {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0; background: transparent; min-width: auto;
+}
+.path-suggest-run { display: flex; align-items: center; gap: 6px; color: var(--text-primary); }
+.path-suggest-time {
+  font-size: 12px; color: var(--text-secondary); font-family: 'Chivo Mono', monospace;
+}
+.path-suggest-gain {
+  font-size: 18px; font-weight: 700; font-family: 'Chivo Mono', monospace;
+  color: #4ade80;
+}
+[data-theme="light"] .path-suggest-gain { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+[data-theme="light"] .score-delta { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+[data-theme="light"] .overall-score-num { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+
+/* Smooth expand/collapse for filter sections */
+.expandable-content {
+  overflow: hidden;
+  transition: max-height 0.28s ease, opacity 0.22s ease;
+  max-height: 0;
+  opacity: 0;
+}
+.expandable-content.open {
+  max-height: 500px;
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .app-two-col { grid-template-columns: 1fr; }
+  .left-panel { position: static; }
+}
 @media (max-width: 768px) {
   .search-grid { grid-template-columns: 1fr 1fr; }
   .target-row { grid-template-columns: 1fr; }
   .constraints-grid { grid-template-columns: 1fr; }
   .dungeon-checkboxes { grid-template-columns: 1fr; }
-  .path-summary { flex-wrap: wrap; }
   .header-inner { flex-wrap: wrap; gap: 12px; }
-  .dungeon-row { flex-wrap: wrap; }
+  .path-row { flex-direction: column; }
+  .path-suggest { min-width: auto; }
+  .path-arrow-col {
+    padding: 4px 0; border-left: none; border-right: none;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
@@ -295,100 +440,205 @@ const REGIONS = [
   { value: 'tw', label: 'TW' },
 ];
 
-// Comprehensive realm lists (realms rarely change, so bundled directly)
-const REALM_DATA = {
-  us: [
-    {name:"Aegwynn",slug:"aegwynn"},{name:"Aerie Peak",slug:"aerie-peak"},{name:"Agamaggan",slug:"agamaggan"},{name:"Aggramar",slug:"aggramar"},{name:"Akama",slug:"akama"},{name:"Alexstrasza",slug:"alexstrasza"},{name:"Alleria",slug:"alleria"},{name:"Altar of Storms",slug:"altar-of-storms"},{name:"Alterac Mountains",slug:"alterac-mountains"},{name:"Aman'Thul",slug:"amanthul"},{name:"Andorhal",slug:"andorhal"},{name:"Anetheron",slug:"anetheron"},{name:"Antonidas",slug:"antonidas"},{name:"Anub'arak",slug:"anubarak"},{name:"Anvilmar",slug:"anvilmar"},{name:"Arathor",slug:"arathor"},{name:"Archimonde",slug:"archimonde"},{name:"Area 52",slug:"area-52"},{name:"Argent Dawn",slug:"argent-dawn"},{name:"Arthas",slug:"arthas"},{name:"Arygos",slug:"arygos"},{name:"Auchindoun",slug:"auchindoun"},{name:"Azgalor",slug:"azgalor"},{name:"Azjol-Nerub",slug:"azjolnerub"},{name:"Azralon",slug:"azralon"},{name:"Azshara",slug:"azshara"},{name:"Azuremyst",slug:"azuremyst"},{name:"Baelgun",slug:"baelgun"},{name:"Balnazzar",slug:"balnazzar"},{name:"Barthilas",slug:"barthilas"},{name:"Black Dragonflight",slug:"black-dragonflight"},{name:"Blackhand",slug:"blackhand"},{name:"Blackrock",slug:"blackrock"},{name:"Blackwater Raiders",slug:"blackwater-raiders"},{name:"Blackwing Lair",slug:"blackwing-lair"},{name:"Blade's Edge",slug:"blades-edge"},{name:"Bladefist",slug:"bladefist"},{name:"Bleeding Hollow",slug:"bleeding-hollow"},{name:"Blood Furnace",slug:"blood-furnace"},{name:"Bloodhoof",slug:"bloodhoof"},{name:"Bloodscalp",slug:"bloodscalp"},{name:"Bonechewer",slug:"bonechewer"},{name:"Borean Tundra",slug:"borean-tundra"},{name:"Boulderfist",slug:"boulderfist"},{name:"Bronzebeard",slug:"bronzebeard"},{name:"Burning Blade",slug:"burning-blade"},{name:"Burning Legion",slug:"burning-legion"},{name:"Caelestrasz",slug:"caelestrasz"},{name:"Cairne",slug:"cairne"},{name:"Cenarion Circle",slug:"cenarion-circle"},{name:"Cenarius",slug:"cenarius"},{name:"Cho'gall",slug:"chogall"},{name:"Chromaggus",slug:"chromaggus"},{name:"Coilfang",slug:"coilfang"},{name:"Crushridge",slug:"crushridge"},{name:"Daggerspine",slug:"daggerspine"},{name:"Dalaran",slug:"dalaran"},{name:"Dalvengyr",slug:"dalvengyr"},{name:"Dark Iron",slug:"dark-iron"},{name:"Darkspear",slug:"darkspear"},{name:"Darrowmere",slug:"darrowmere"},{name:"Dath'Remar",slug:"dathremar"},{name:"Dawnbringer",slug:"dawnbringer"},{name:"Deathwing",slug:"deathwing"},{name:"Demon Soul",slug:"demon-soul"},{name:"Dentarg",slug:"dentarg"},{name:"Destromath",slug:"destromath"},{name:"Dethecus",slug:"dethecus"},{name:"Detheroc",slug:"detheroc"},{name:"Doomhammer",slug:"doomhammer"},{name:"Draenor",slug:"draenor"},{name:"Dragonblight",slug:"dragonblight"},{name:"Dragonmaw",slug:"dragonmaw"},{name:"Drak'Tharon",slug:"draktharon"},{name:"Drak'thul",slug:"drakthul"},{name:"Draka",slug:"draka"},{name:"Drakkari",slug:"drakkari"},{name:"Dreadmaul",slug:"dreadmaul"},{name:"Drenden",slug:"drenden"},{name:"Dunemaul",slug:"dunemaul"},{name:"Durotan",slug:"durotan"},{name:"Duskwood",slug:"duskwood"},{name:"Earthen Ring",slug:"earthen-ring"},{name:"Echo Isles",slug:"echo-isles"},{name:"Eitrigg",slug:"eitrigg"},{name:"Eldre'Thalas",slug:"eldrethalas"},{name:"Elune",slug:"elune"},{name:"Emerald Dream",slug:"emerald-dream"},{name:"Eonar",slug:"eonar"},{name:"Eredar",slug:"eredar"},{name:"Executus",slug:"executus"},{name:"Exodar",slug:"exodar"},{name:"Farstriders",slug:"farstriders"},{name:"Feathermoon",slug:"feathermoon"},{name:"Fenris",slug:"fenris"},{name:"Firetree",slug:"firetree"},{name:"Fizzcrank",slug:"fizzcrank"},{name:"Frostmane",slug:"frostmane"},{name:"Frostmourne",slug:"frostmourne"},{name:"Frostwolf",slug:"frostwolf"},{name:"Galakrond",slug:"galakrond"},{name:"Gallywix",slug:"gallywix"},{name:"Garithos",slug:"garithos"},{name:"Garona",slug:"garona"},{name:"Garrosh",slug:"garrosh"},{name:"Ghostlands",slug:"ghostlands"},{name:"Gilneas",slug:"gilneas"},{name:"Gnomeregan",slug:"gnomeregan"},{name:"Goldrinn",slug:"goldrinn"},{name:"Gorefiend",slug:"gorefiend"},{name:"Gorgonnash",slug:"gorgonnash"},{name:"Greymane",slug:"greymane"},{name:"Grizzly Hills",slug:"grizzly-hills"},{name:"Gul'dan",slug:"guldan"},{name:"Gundrak",slug:"gundrak"},{name:"Gurubashi",slug:"gurubashi"},{name:"Hakkar",slug:"hakkar"},{name:"Haomarush",slug:"haomarush"},{name:"Hellscream",slug:"hellscream"},{name:"Hydraxis",slug:"hydraxis"},{name:"Hyjal",slug:"hyjal"},{name:"Icecrown",slug:"icecrown"},{name:"Illidan",slug:"illidan"},{name:"Jaedenar",slug:"jaedenar"},{name:"Jubei'Thos",slug:"jubeithos"},{name:"Kael'thas",slug:"kaelthas"},{name:"Kalecgos",slug:"kalecgos"},{name:"Kargath",slug:"kargath"},{name:"Kel'Thuzad",slug:"kelthuzad"},{name:"Khadgar",slug:"khadgar"},{name:"Khaz Modan",slug:"khaz-modan"},{name:"Khaz'goroth",slug:"khazgoroth"},{name:"Kil'jaeden",slug:"kiljaeden"},{name:"Kilrogg",slug:"kilrogg"},{name:"Kirin Tor",slug:"kirin-tor"},{name:"Korgath",slug:"korgath"},{name:"Korialstrasz",slug:"korialstrasz"},{name:"Kul Tiras",slug:"kul-tiras"},{name:"Laughing Skull",slug:"laughing-skull"},{name:"Lethon",slug:"lethon"},{name:"Lightbringer",slug:"lightbringer"},{name:"Lightning's Blade",slug:"lightnings-blade"},{name:"Lightninghoof",slug:"lightninghoof"},{name:"Llane",slug:"llane"},{name:"Lothar",slug:"lothar"},{name:"Madoran",slug:"madoran"},{name:"Maelstrom",slug:"maelstrom"},{name:"Magtheridon",slug:"magtheridon"},{name:"Maiev",slug:"maiev"},{name:"Mal'Ganis",slug:"malganis"},{name:"Malfurion",slug:"malfurion"},{name:"Malorne",slug:"malorne"},{name:"Malygos",slug:"malygos"},{name:"Mannoroth",slug:"mannoroth"},{name:"Medivh",slug:"medivh"},{name:"Misha",slug:"misha"},{name:"Mok'Nathal",slug:"moknathal"},{name:"Moon Guard",slug:"moon-guard"},{name:"Moonrunner",slug:"moonrunner"},{name:"Mug'thol",slug:"mugthol"},{name:"Muradin",slug:"muradin"},{name:"Nagrand",slug:"nagrand"},{name:"Nathrezim",slug:"nathrezim"},{name:"Nazgrel",slug:"nazgrel"},{name:"Nazjatar",slug:"nazjatar"},{name:"Nemesis",slug:"nemesis"},{name:"Ner'zhul",slug:"nerzhul"},{name:"Nesingwary",slug:"nesingwary"},{name:"Nordrassil",slug:"nordrassil"},{name:"Norgannon",slug:"norgannon"},{name:"Onyxia",slug:"onyxia"},{name:"Perenolde",slug:"perenolde"},{name:"Proudmoore",slug:"proudmoore"},{name:"Quel'dorei",slug:"queldorei"},{name:"Quel'Thalas",slug:"quelthalas"},{name:"Ragnaros",slug:"ragnaros"},{name:"Ravencrest",slug:"ravencrest"},{name:"Ravenholdt",slug:"ravenholdt"},{name:"Rexxar",slug:"rexxar"},{name:"Rivendare",slug:"rivendare"},{name:"Runetotem",slug:"runetotem"},{name:"Sargeras",slug:"sargeras"},{name:"Saurfang",slug:"saurfang"},{name:"Scarlet Crusade",slug:"scarlet-crusade"},{name:"Scilla",slug:"scilla"},{name:"Sen'jin",slug:"senjin"},{name:"Sentinels",slug:"sentinels"},{name:"Shadow Council",slug:"shadow-council"},{name:"Shadowmoon",slug:"shadowmoon"},{name:"Shadowsong",slug:"shadowsong"},{name:"Shandris",slug:"shandris"},{name:"Shattered Halls",slug:"shattered-halls"},{name:"Shattered Hand",slug:"shattered-hand"},{name:"Shu'halo",slug:"shuhalo"},{name:"Silver Hand",slug:"silver-hand"},{name:"Silvermoon",slug:"silvermoon"},{name:"Sisters of Elune",slug:"sisters-of-elune"},{name:"Skullcrusher",slug:"skullcrusher"},{name:"Skywall",slug:"skywall"},{name:"Smolderthorn",slug:"smolderthorn"},{name:"Spinebreaker",slug:"spinebreaker"},{name:"Spirestone",slug:"spirestone"},{name:"Staghelm",slug:"staghelm"},{name:"Steamwheedle Cartel",slug:"steamwheedle-cartel"},{name:"Stonemaul",slug:"stonemaul"},{name:"Stormrage",slug:"stormrage"},{name:"Stormreaver",slug:"stormreaver"},{name:"Stormscale",slug:"stormscale"},{name:"Suramar",slug:"suramar"},{name:"Tanaris",slug:"tanaris"},{name:"Terenas",slug:"terenas"},{name:"Terokkar",slug:"terokkar"},{name:"Thaurissan",slug:"thaurissan"},{name:"The Forgotten Coast",slug:"the-forgotten-coast"},{name:"The Scryers",slug:"the-scryers"},{name:"The Underbog",slug:"the-underbog"},{name:"The Venture Co",slug:"the-venture-co"},{name:"Thorium Brotherhood",slug:"thorium-brotherhood"},{name:"Thrall",slug:"thrall"},{name:"Thunderhorn",slug:"thunderhorn"},{name:"Thunderlord",slug:"thunderlord"},{name:"Tichondrius",slug:"tichondrius"},{name:"Tol Barad",slug:"tol-barad"},{name:"Tortheldrin",slug:"tortheldrin"},{name:"Trollbane",slug:"trollbane"},{name:"Turalyon",slug:"turalyon"},{name:"Twisting Nether",slug:"twisting-nether"},{name:"Uldaman",slug:"uldaman"},{name:"Uldum",slug:"uldum"},{name:"Undermine",slug:"undermine"},{name:"Ursin",slug:"ursin"},{name:"Uther",slug:"uther"},{name:"Vashj",slug:"vashj"},{name:"Vek'nilash",slug:"veknilash"},{name:"Velen",slug:"velen"},{name:"Warsong",slug:"warsong"},{name:"Whisperwind",slug:"whisperwind"},{name:"Wildhammer",slug:"wildhammer"},{name:"Windrunner",slug:"windrunner"},{name:"Winterhoof",slug:"winterhoof"},{name:"Wyrmrest Accord",slug:"wyrmrest-accord"},{name:"Ysera",slug:"ysera"},{name:"Ysondre",slug:"ysondre"},{name:"Zangarmarsh",slug:"zangarmarsh"},{name:"Zuluhed",slug:"zuluhed"},{name:"Zul'jin",slug:"zuljin"},
-  ],
-  eu: [
-    {name:"Aegwynn",slug:"aegwynn"},{name:"Aerie Peak",slug:"aerie-peak"},{name:"Agamaggan",slug:"agamaggan"},{name:"Aggra (Português)",slug:"aggra-português"},{name:"Aggramar",slug:"aggramar"},{name:"Ahn'Qiraj",slug:"ahnqiraj"},{name:"Al'Akir",slug:"alakir"},{name:"Alexstrasza",slug:"alexstrasza"},{name:"Alleria",slug:"alleria"},{name:"Alonsus",slug:"alonsus"},{name:"Ambossar",slug:"ambossar"},{name:"Anachronos",slug:"anachronos"},{name:"Anetheron",slug:"anetheron"},{name:"Antonidas",slug:"antonidas"},{name:"Anub'arak",slug:"anubarak"},{name:"Arathi",slug:"arathi"},{name:"Arathor",slug:"arathor"},{name:"Archimonde",slug:"archimonde"},{name:"Area 52",slug:"area-52"},{name:"Argent Dawn",slug:"argent-dawn"},{name:"Arthas",slug:"arthas"},{name:"Arygos",slug:"arygos"},{name:"Aszune",slug:"aszune"},{name:"Auchindoun",slug:"auchindoun"},{name:"Azjol-Nerub",slug:"azjolnerub"},{name:"Azshara",slug:"azshara"},{name:"Azuremyst",slug:"azuremyst"},{name:"Baelgun",slug:"baelgun"},{name:"Balnazzar",slug:"balnazzar"},{name:"Blackhand",slug:"blackhand"},{name:"Blackmoore",slug:"blackmoore"},{name:"Blackrock",slug:"blackrock"},{name:"Blade's Edge",slug:"blades-edge"},{name:"Bladefist",slug:"bladefist"},{name:"Bloodfeather",slug:"bloodfeather"},{name:"Bloodhoof",slug:"bloodhoof"},{name:"Bloodscalp",slug:"bloodscalp"},{name:"Blutkessel",slug:"blutkessel"},{name:"Boulderfist",slug:"boulderfist"},{name:"Bronze Dragonflight",slug:"bronze-dragonflight"},{name:"Bronzebeard",slug:"bronzebeard"},{name:"Burning Blade",slug:"burning-blade"},{name:"Burning Legion",slug:"burning-legion"},{name:"Burning Steppes",slug:"burning-steppes"},{name:"C'Thun",slug:"cthun"},{name:"Chamber of Aspects",slug:"chamber-of-aspects"},{name:"Chants éternels",slug:"chants-éternels"},{name:"Cho'gall",slug:"chogall"},{name:"Chromaggus",slug:"chromaggus"},{name:"Colinas Pardas",slug:"colinas-pardas"},{name:"Confrérie du Thorium",slug:"confrérie-du-thorium"},{name:"Conseil des Ombres",slug:"conseil-des-ombres"},{name:"Crushridge",slug:"crushridge"},{name:"Culte de la Rive noire",slug:"culte-de-la-rive-noire"},{name:"Daggerspine",slug:"daggerspine"},{name:"Dalaran",slug:"dalaran"},{name:"Dalvengyr",slug:"dalvengyr"},{name:"Darkmoon Faire",slug:"darkmoon-faire"},{name:"Darksorrow",slug:"darksorrow"},{name:"Darkspear",slug:"darkspear"},{name:"Das Konsortium",slug:"das-konsortium"},{name:"Das Syndikat",slug:"das-syndikat"},{name:"Deathwing",slug:"deathwing"},{name:"Defias Brotherhood",slug:"defias-brotherhood"},{name:"Dentarg",slug:"dentarg"},{name:"Der abyssische Rat",slug:"der-abyssische-rat"},{name:"Der Mithrilorden",slug:"der-mithrilorden"},{name:"Der Rat von Dalaran",slug:"der-rat-von-dalaran"},{name:"Destromath",slug:"destromath"},{name:"Dethecus",slug:"dethecus"},{name:"Die Aldor",slug:"die-aldor"},{name:"Die Arguswacht",slug:"die-arguswacht"},{name:"Die ewige Wacht",slug:"die-ewige-wacht"},{name:"Die Nachtwache",slug:"die-nachtwache"},{name:"Die Silberne Hand",slug:"die-silberne-hand"},{name:"Die Todeskrallen",slug:"die-todeskrallen"},{name:"Doomhammer",slug:"doomhammer"},{name:"Draenor",slug:"draenor"},{name:"Dragonblight",slug:"dragonblight"},{name:"Dragonmaw",slug:"dragonmaw"},{name:"Drak'thul",slug:"drakthul"},{name:"Drek'Thar",slug:"drekthar"},{name:"Dun Modr",slug:"dun-modr"},{name:"Dun Morogh",slug:"dun-morogh"},{name:"Dunemaul",slug:"dunemaul"},{name:"Durotan",slug:"durotan"},{name:"Earthen Ring",slug:"earthen-ring"},{name:"Echsenkessel",slug:"echsenkessel"},{name:"Eitrigg",slug:"eitrigg"},{name:"Eldre'Thalas",slug:"eldrethalas"},{name:"Elune",slug:"elune"},{name:"Emerald Dream",slug:"emerald-dream"},{name:"Emeriss",slug:"emeriss"},{name:"Eonar",slug:"eonar"},{name:"Eredar",slug:"eredar"},{name:"Executus",slug:"executus"},{name:"Exodar",slug:"exodar"},{name:"Festung der Stürme",slug:"festung-der-stürme"},{name:"Forscherliga",slug:"forscherliga"},{name:"Frostmane",slug:"frostmane"},{name:"Frostwhisper",slug:"frostwhisper"},{name:"Frostwolf",slug:"frostwolf"},{name:"Garona",slug:"garona"},{name:"Garrosh",slug:"garrosh"},{name:"Genjuros",slug:"genjuros"},{name:"Ghostlands",slug:"ghostlands"},{name:"Gilneas",slug:"gilneas"},{name:"Gorgonnash",slug:"gorgonnash"},{name:"Grim Batol",slug:"grim-batol"},{name:"Gul'dan",slug:"guldan"},{name:"Hakkar",slug:"hakkar"},{name:"Haomarush",slug:"haomarush"},{name:"Hellfire",slug:"hellfire"},{name:"Hellscream",slug:"hellscream"},{name:"Hyjal",slug:"hyjal"},{name:"Illidan",slug:"illidan"},{name:"Jaedenar",slug:"jaedenar"},{name:"Kael'thas",slug:"kaelthas"},{name:"Karazhan",slug:"karazhan"},{name:"Kargath",slug:"kargath"},{name:"Kazzak",slug:"kazzak"},{name:"Kel'Thuzad",slug:"kelthuzad"},{name:"Khadgar",slug:"khadgar"},{name:"Khaz Modan",slug:"khaz-modan"},{name:"Khaz'goroth",slug:"khazgoroth"},{name:"Kil'Jaeden",slug:"kiljaeden"},{name:"Kilrogg",slug:"kilrogg"},{name:"Kirin Tor",slug:"kirin-tor"},{name:"Kor'gall",slug:"korgall"},{name:"Krag'jin",slug:"kragjin"},{name:"Krasus",slug:"krasus"},{name:"Kul Tiras",slug:"kul-tiras"},{name:"Kult der Verdammten",slug:"kult-der-verdammten"},{name:"La Croisade écarlate",slug:"la-croisade-écarlate"},{name:"Laughing Skull",slug:"laughing-skull"},{name:"Les Clairvoyants",slug:"les-clairvoyants"},{name:"Les Sentinelles",slug:"les-sentinelles"},{name:"Lich King",slug:"lich-king"},{name:"Lightbringer",slug:"lightbringer"},{name:"Lightning's Blade",slug:"lightnings-blade"},{name:"Lordaeron",slug:"lordaeron"},{name:"Los Errantes",slug:"los-errantes"},{name:"Lothar",slug:"lothar"},{name:"Madmortem",slug:"madmortem"},{name:"Magtheridon",slug:"magtheridon"},{name:"Malfurion",slug:"malfurion"},{name:"Malorne",slug:"malorne"},{name:"Malygos",slug:"malygos"},{name:"Mannoroth",slug:"mannoroth"},{name:"Mazrigos",slug:"mazrigos"},{name:"Medivh",slug:"medivh"},{name:"Minahonda",slug:"minahonda"},{name:"Moonglade",slug:"moonglade"},{name:"Mug'thol",slug:"mugthol"},{name:"Nagrand",slug:"nagrand"},{name:"Nathrezim",slug:"nathrezim"},{name:"Naxxramas",slug:"naxxramas"},{name:"Nazjatar",slug:"nazjatar"},{name:"Nefarian",slug:"nefarian"},{name:"Nemesis",slug:"nemesis"},{name:"Neptulon",slug:"neptulon"},{name:"Nera'thor",slug:"nerathor"},{name:"Ner'zhul",slug:"nerzhul"},{name:"Nethersturm",slug:"nethersturm"},{name:"Nordrassil",slug:"nordrassil"},{name:"Norgannon",slug:"norgannon"},{name:"Nozdormu",slug:"nozdormu"},{name:"Onyxia",slug:"onyxia"},{name:"Outland",slug:"outland"},{name:"Perenolde",slug:"perenolde"},{name:"Proudmoore",slug:"proudmoore"},{name:"Quel'Thalas",slug:"quelthalas"},{name:"Ragnaros",slug:"ragnaros"},{name:"Rajaxx",slug:"rajaxx"},{name:"Ravencrest",slug:"ravencrest"},{name:"Ravenholdt",slug:"ravenholdt"},{name:"Rexxar",slug:"rexxar"},{name:"Runetotem",slug:"runetotem"},{name:"Sanguino",slug:"sanguino"},{name:"Sargeras",slug:"sargeras"},{name:"Saurfang",slug:"saurfang"},{name:"Scarshield Legion",slug:"scarshield-legion"},{name:"Sen'jin",slug:"senjin"},{name:"Shadowsong",slug:"shadowsong"},{name:"Shattered Halls",slug:"shattered-halls"},{name:"Shattered Hand",slug:"shattered-hand"},{name:"Shattrath",slug:"shattrath"},{name:"Shen'dralar",slug:"shendralar"},{name:"Silvermoon",slug:"silvermoon"},{name:"Sinstralis",slug:"sinstralis"},{name:"Skullcrusher",slug:"skullcrusher"},{name:"Spinebreaker",slug:"spinebreaker"},{name:"Sporeggar",slug:"sporeggar"},{name:"Steamwheedle Cartel",slug:"steamwheedle-cartel"},{name:"Stonemaul",slug:"stonemaul"},{name:"Stormrage",slug:"stormrage"},{name:"Stormreaver",slug:"stormreaver"},{name:"Stormscale",slug:"stormscale"},{name:"Sunstrider",slug:"sunstrider"},{name:"Suramar",slug:"suramar"},{name:"Sylvanas",slug:"sylvanas"},{name:"Tarren Mill",slug:"tarren-mill"},{name:"Teldrassil",slug:"teldrassil"},{name:"Temple noir",slug:"temple-noir"},{name:"Terenas",slug:"terenas"},{name:"Terokkar",slug:"terokkar"},{name:"Terrordar",slug:"terrordar"},{name:"The Maelstrom",slug:"the-maelstrom"},{name:"The Sha'tar",slug:"the-shatar"},{name:"The Venture Co",slug:"the-venture-co"},{name:"Theradras",slug:"theradras"},{name:"Thrall",slug:"thrall"},{name:"Thunderhorn",slug:"thunderhorn"},{name:"Tichondrius",slug:"tichondrius"},{name:"Tirion",slug:"tirion"},{name:"Todeswache",slug:"todeswache"},{name:"Trollbane",slug:"trollbane"},{name:"Turalyon",slug:"turalyon"},{name:"Twilight's Hammer",slug:"twilights-hammer"},{name:"Twisting Nether",slug:"twisting-nether"},{name:"Tyrande",slug:"tyrande"},{name:"Uldaman",slug:"uldaman"},{name:"Uldum",slug:"uldum"},{name:"Un'Goro",slug:"ungoro"},{name:"Varimathras",slug:"varimathras"},{name:"Vashj",slug:"vashj"},{name:"Vek'lor",slug:"veklor"},{name:"Vek'nilash",slug:"veknilash"},{name:"Vol'jin",slug:"voljin"},{name:"Warsong",slug:"warsong"},{name:"Wildhammer",slug:"wildhammer"},{name:"Xavius",slug:"xavius"},{name:"Ysera",slug:"ysera"},{name:"Ysondre",slug:"ysondre"},{name:"Zenedar",slug:"zenedar"},{name:"Zirkel des Cenarius",slug:"zirkel-des-cenarius"},{name:"Zul'jin",slug:"zuljin"},{name:"Zuluhed",slug:"zuluhed"},
-  ],
-  kr: [
-    {name:"Azshara",slug:"azshara"},{name:"Burning Legion",slug:"burning-legion"},{name:"Durotan",slug:"durotan"},{name:"Norgannon",slug:"norgannon"},{name:"Garona",slug:"garona"},{name:"Gul'dan",slug:"guldan"},{name:"Dalaran",slug:"dalaran"},{name:"Deathwing",slug:"deathwing"},{name:"Rexxar",slug:"rexxar"},{name:"Malfurion",slug:"malfurion"},{name:"Stormrage",slug:"stormrage"},{name:"Windrunner",slug:"windrunner"},{name:"Zul'jin",slug:"zuljin"},{name:"Hyjal",slug:"hyjal"},{name:"Hellscream",slug:"hellscream"},{name:"Cenarius",slug:"cenarius"},{name:"Wildhammer",slug:"wildhammer"},{name:"Alexstrasza",slug:"alexstrasza"},{name:"Kargath",slug:"kargath"},{name:"Ragnaros",slug:"ragnaros"},{name:"Illidan",slug:"illidan"},{name:"Tirion",slug:"tirion"},{name:"Blackrock",slug:"blackrock"},
-  ],
-  tw: [
-    {name:"Crystalpine Stinger",slug:"crystalpine-stinger"},{name:"Nightsong",slug:"nightsong"},{name:"World Tree",slug:"world-tree"},{name:"Arygos",slug:"arygos"},{name:"Eonar",slug:"eonar"},{name:"Sundown Marsh",slug:"sundown-marsh"},{name:"Hellscream",slug:"hellscream"},{name:"Bleeding Hollow",slug:"bleeding-hollow"},{name:"Frostmourne",slug:"frostmourne"},{name:"Dragonmaw",slug:"dragonmaw"},{name:"Exodar",slug:"exodar"},{name:"Shadowmoon",slug:"shadowmoon"},{name:"Whisperwind",slug:"whisperwind"},{name:"Silverwing Hold",slug:"silverwing-hold"},{name:"Wrathbringer",slug:"wrathbringer"},{name:"Order of the Cloud Serpent",slug:"order-of-the-cloud-serpent"},{name:"Light's Hope",slug:"lights-hope"},{name:"Skyguard",slug:"skyguard"},{name:"Menethil",slug:"menethil"},{name:"Stonemaul",slug:"stonemaul"},{name:"Stormrage",slug:"stormrage"},{name:"Demon Fall Canyon",slug:"demon-fall-canyon"},{name:"Icecrown",slug:"icecrown"},{name:"Altar of Storms",slug:"altar-of-storms"},{name:"Arathi",slug:"arathi"},
-  ],
+// Blizzard API region hosts
+const BLIZZARD_API_HOSTS = {
+  us: 'us.api.blizzard.com',
+  eu: 'eu.api.blizzard.com',
+  kr: 'kr.api.blizzard.com',
+  tw: 'tw.api.blizzard.com',
 };
 
-// Fallback dungeons — these only matter if the API returns zero runs for a character
+// Map Blizzard internal season IDs to marketing names
+const SEASON_NAMES = {
+  13: 'TWW Season 1', 14: 'TWW Season 2', 15: 'TWW Season 3',
+  16: 'TWW Season 4', 17: 'TWW Season 5',
+};
+function getSeasonDisplayName(id) {
+  return SEASON_NAMES[id] || `Season ${id}`;
+}
+
+// Small offline fallback for realms so autocomplete works without API
+const FALLBACK_REALMS = {
+  us: [
+    { name: 'Stormrage', slug: 'stormrage' },
+    { name: 'Sargeras', slug: 'sargeras' },
+    { name: 'Proudmoore', slug: 'proudmoore' },
+    { name: 'Tichondrius', slug: 'tichondrius' },
+    { name: 'Area 52', slug: 'area-52' },
+    { name: 'Illidan', slug: 'illidan' },
+    { name: 'Mal\'Ganis', slug: 'malganis' },
+    { name: 'Thrall', slug: 'thrall' },
+  ],
+  eu: [
+    { name: 'Silvermoon', slug: 'silvermoon' },
+    { name: 'Ragnaros', slug: 'ragnaros' },
+    { name: 'Draenor', slug: 'draenor' },
+    { name: 'Kazzak', slug: 'kazzak' },
+    { name: 'Twisting Nether', slug: 'twisting-nether' },
+  ],
+  kr: [ { name: 'Azshara', slug: 'azshara' }, { name: 'Hellscream', slug: 'hellscream' } ],
+  tw: [ { name: 'Bleeding Hollow', slug: 'bleeding-hollow' }, { name: 'Sundown Marsh', slug: 'sundown-marsh' } ],
+};
+
+// TWW Season 3 dungeon pool (fallback if API returns no runs)
 const FALLBACK_DUNGEONS = [
-  { slug: 'ara-kara-city-of-echoes', name: 'Ara-Kara, City of Echoes', short: 'ARA', timer: 1920 },
-  { slug: 'the-dawnbreaker', name: 'The Dawnbreaker', short: 'DAWN', timer: 2040 },
-  { slug: 'operation-floodgate', name: 'Operation: Floodgate', short: 'FLOOD', timer: 1920 },
-  { slug: 'priory-of-the-sacred-flame', name: 'Priory of the Sacred Flame', short: 'PSF', timer: 2100 },
-  { slug: 'halls-of-atonement', name: 'Halls of Atonement', short: 'HOA', timer: 1920 },
-  { slug: 'tazavesh-streets-of-wonder', name: 'Tazavesh: Streets of Wonder', short: 'STREETS', timer: 2400 },
+  { slug: 'eco-dome-aldani', name: "Eco-Dome Al'dani", short: 'ECO', timer: 1860 },
+  { slug: 'ara-kara-city-of-echoes', name: 'Ara-Kara, City of Echoes', short: 'ARA', timer: 1800 },
+  { slug: 'the-dawnbreaker', name: 'The Dawnbreaker', short: 'DAWN', timer: 1860 },
+  { slug: 'priory-of-the-sacred-flame', name: 'Priory of the Sacred Flame', short: 'PSF', timer: 1950 },
+  { slug: 'operation-floodgate', name: 'Operation: Floodgate', short: 'FLOOD', timer: 1980 },
+  { slug: 'halls-of-atonement', name: 'Halls of Atonement', short: 'HOA', timer: 1860 },
+  { slug: 'tazavesh-streets-of-wonder', name: 'Tazavesh: Streets of Wonder', short: 'STREETS', timer: 2340 },
   { slug: 'tazavesh-soleahs-gambit', name: "Tazavesh: So'leah's Gambit", short: 'GAMBIT', timer: 1800 },
-  { slug: 'eco-dome-aldani', name: "Eco-Dome Al'dani", short: 'ECO', timer: 1800 },
 ];
 
+// Map API-generated slugs to WoW armory image slugs (only entries that differ)
+const DUNGEON_IMAGE_SLUGS = {
+  'eco-dome-al-dani': 'eco-dome-aldani',
+  'tazavesh-so-leah-s-gambit': 'tazavesh-the-veiled-market',
+  'tazavesh-soleahs-gambit': 'tazavesh-the-veiled-market',
+  'tazavesh-streets-of-wonder': 'tazavesh-the-veiled-market',
+};
+
+// Fetch current season's dungeon list dynamically from Blizzard API
+async function fetchCurrentSeasonDungeons() {
+  try {
+    const host = BLIZZARD_API_HOSTS['us'];
+    // Get current season ID
+    const seasonIndex = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/season/index?namespace=dynamic-us&locale=en_US`
+    );
+    const currentSeason = seasonIndex?.current_season?.id || seasonIndex?.seasons?.[seasonIndex.seasons.length - 1]?.id;
+    if (!currentSeason) return null;
+
+    // Get season detail — contains periods with dungeon references
+    const seasonDetail = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/season/${currentSeason}?namespace=dynamic-us&locale=en_US`
+    );
+
+    // Get current period to find the active dungeons
+    const periodIndex = await fetchBlizzardApi(
+      `https://${host}/data/wow/mythic-keystone/period/index?namespace=dynamic-us&locale=en_US`
+    );
+    const currentPeriodId = periodIndex?.current_period?.id;
+
+    // Try to get the current period's leaderboard index — this lists only the active season dungeons
+    if (currentPeriodId) {
+      try {
+        // The connected-realm leaderboard index lists current dungeons
+        // Use connected realm 11 (Stormrage, a large US realm) as a reference
+        const lbIndex = await fetchBlizzardApi(
+          `https://${host}/data/wow/connected-realm/11/mythic-leaderboard/index?namespace=dynamic-us&locale=en_US`
+        );
+        if (lbIndex?.current_leaderboards?.length) {
+          const dungeons = [];
+          const seen = new Set();
+          for (const lb of lbIndex.current_leaderboards) {
+            const name = lb.name || '';
+            if (!name || seen.has(name)) continue;
+            seen.add(name);
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            const short = name.split(/[\s:,!]+/).filter(w=>w).map(w => w[0]).join('').toUpperCase().substring(0, 5);
+            dungeons.push({ slug, name, short, timer: 2100 });
+          }
+          if (dungeons.length >= 4 && dungeons.length <= 12) {
+            // Now fetch individual dungeon details for accurate timers (only 8ish calls)
+            for (let i = 0; i < dungeons.length; i++) {
+              const lb = lbIndex.current_leaderboards.find(l => l.name === dungeons[i].name);
+              if (lb?.id) {
+                try {
+                  const detail = await fetchBlizzardApi(
+                    `https://${host}/data/wow/mythic-keystone/dungeon/${lb.id}?namespace=dynamic-us&locale=en_US`
+                  );
+                  if (detail.keystone_upgrades?.[0]?.qualifying_duration) {
+                    dungeons[i].timer = Math.round(detail.keystone_upgrades[0].qualifying_duration / 1000);
+                  }
+                } catch(e) { /* use default timer */ }
+              }
+            }
+            return { dungeons, seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
+          }
+        }
+      } catch(e) {
+        console.log('Leaderboard approach failed, using season periods:', e);
+      }
+    }
+
+    // Fallback: extract dungeons from season detail periods if available
+    if (seasonDetail?.periods?.length) {
+      // Season periods list the dungeon rotation
+      console.log('Season detail has', seasonDetail.periods.length, 'periods');
+    }
+
+    return { dungeons: [], seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
+  } catch(e) {
+    console.log('Failed to fetch current season dungeons:', e);
+  }
+  return null;
+}
+
 function getDungeonIcon(slug) {
-  return `https://cdnassets.raider.io/images/dungeons/expansion10/base/${slug}.jpg`;
+  const imageSlug = DUNGEON_IMAGE_SLUGS[slug] || slug;
+  return `https://render.worldofwarcraft.com/us/zones/${imageSlug}-small.jpg`;
 }
 
 function calcRunScore(keyLevel, stars) {
+  // Estimate Blizzard's M+ rating for path-finding predictions (actual runs use map_rating.rating)
+  // Base score: 155 at key 2, ~485 at key 20 (per mythicplanner.com)
   if (keyLevel < 2) return 0;
-  const base = keyLevel * 7 + 20;
-  return base + (stars === 3 ? 10 : stars === 2 ? 5 : 0);
+  const base = 155 + (keyLevel - 2) * 18.33;
+  // Stars approximate completion time relative to timer:
+  // 3 = ~60% of timer (PT≈0.40), 2 = ~80% (PT≈0.20), 1 = just timed (PT≈0.05), 0 = overtime
+  // bonus = min(PT, 0.40) * 37.5, overtime penalty = -15
+  if (stars >= 3) return base + 15;    // 0.40 * 37.5
+  if (stars >= 2) return base + 7.5;   // 0.20 * 37.5
+  if (stars >= 1) return base + 1.875; // 0.05 * 37.5
+  return Math.max(base - 15, 0);       // overtime penalty
 }
 
-function calcDungeonTotalScore(f, t) {
-  const hi = Math.max(f || 0, t || 0), lo = Math.min(f || 0, t || 0);
-  return Math.round(hi * 1.5 + lo * 0.5);
-}
+
 
 function formatTime(sec) {
   return `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
 }
 
-function getAffixesForLevel(kl, weekly) {
-  const a = [weekly || 'Fortified'];
-  if (kl >= 4) a.push("Xal'atath's Bargain");
+function getAffixesForLevel(kl) {
+  const a = [];
+  if (kl >= 2) a.push("Xal'atath's Bargain");
+  if (kl >= 4) a.push('Tyrannical');
   if (kl >= 7) a.push("Challenger's Peril");
-  if (kl >= 10) a.push(weekly === 'Fortified' ? 'Tyrannical' : 'Fortified');
+  if (kl >= 10) a.push('Fortified');
   if (kl >= 12) { const i = a.indexOf("Challenger's Peril"); if (i > -1) a.splice(i, 1, "Challenger's Bane"); }
   return a;
 }
 
-// Fetch with CORS proxy fallback for Raider.io API
-async function fetchWithCorsFallback(url, opts) {
+// Fetch from Blizzard API through our proxy (handles OAuth2 server-side)
+async function fetchBlizzardApi(url) {
   const isLocal = window.location.hostname === 'localhost' ||
-                  window.location.hostname === '127.0.0.1' ||
-                  window.location.protocol === 'file:';
+                  window.location.hostname === '127.0.0.1';
 
-  // If local, use our own local proxy server (node server.js)
+  // Local dev server proxy
   if (isLocal) {
-    try {
-      const localProxy = 'http://localhost:3000/proxy?url=' + encodeURIComponent(url);
-      const r = await fetch(localProxy, opts);
-      if (r.ok) return r;
-    } catch (e) {
-      console.log('Local proxy not available, trying other methods:', e);
+    const proxyUrl = '/api/blizzard?url=' + encodeURIComponent(url);
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+      throw new Error(err.error || `API error ${resp.status}`);
     }
+    return resp.json();
   }
 
-  // Try Vercel/same-origin serverless function proxy
+  // Vercel serverless proxy
   try {
     const vercelProxy = '/api/proxy?url=' + encodeURIComponent(url);
-    const rVercel = await fetch(vercelProxy, opts);
-    if (rVercel.ok) return rVercel;
+    const resp = await fetch(vercelProxy);
+    if (resp.ok) return resp.json();
   } catch (e) {}
 
-  // Fallback to public CORS proxies
-  try {
-    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-    const r2 = await fetch(proxy, opts);
-    if (r2.ok) return r2;
-  } catch (e) {}
-  try {
-    const proxy2 = 'https://corsproxy.io/?' + encodeURIComponent(url);
-    return fetch(proxy2, opts);
-  } catch (e) {
-    throw e;
-  }
+  throw new Error('No API proxy available. Run the local server with: python server.py');
 }
 
+// Absolute thresholds for overall M+ rating display
 function getScoreColor(s) {
   if (s >= 2500) return '#ff8000';
   if (s >= 2000) return '#a335ee';
@@ -398,82 +648,208 @@ function getScoreColor(s) {
   return '#9d9d9d';
 }
 
-function buildDungeonState(bestRuns, altRuns, dungeonList) {
+function getClassColor(className) {
+  const classColors = {
+    'Death Knight': '#c41e3a',
+    'Demon Hunter': '#a335ee',
+    'Druid': '#ff7d0a',
+    'Evoker': '#33937f',
+    'Hunter': '#aad372',
+    'Mage': '#69ccf0',
+    'Monk': '#00ff98',
+    'Paladin': '#f58cba',
+    'Priest': '#c0c0c0',
+    'Rogue': '#fff569',
+    'Shaman': '#0070dd',
+    'Warlock': '#9482ca',
+    'Warrior': '#c79c6e',
+  };
+  return classColors[className] || '#a1a2a6';
+}
+
+// Rank-based 8-point color gradient for per-dungeon scores
+// Each unique score is assigned to one of 8 equally-spaced color stops
+function getDungeonScoreColor(score, allScores, scoreIndex) {
+  // User-provided colors for scores 1-8
+  const colorMap = {
+    1: 'rgb(28, 183, 61)',
+    2: 'rgb(12, 156, 176)',
+    3: 'rgb(70, 98, 247)',
+    4: 'rgb(124, 61, 255)',
+    5: 'rgb(184, 29, 227)',
+    6: 'rgb(213, 72, 177)',
+    7: 'rgb(242, 107, 98)',
+    8: 'rgb(225, 168, 23)',
+  };
+  if (score <= 0) return '#9d9d9d';
+  // If we have a scoreIndex (for path rows showing suggested score), use that
+  if (scoreIndex !== undefined && scoreIndex >= 1 && scoreIndex <= 8) {
+    return colorMap[scoreIndex];
+  }
+  // Otherwise, rank among unique scores and map to color index
+  const vals = allScores.filter(v => v > 0);
+  if (!vals.length) return '#9d9d9d';
+  const unique = [...new Set(vals)].sort((a, b) => a - b);
+  const rank = unique.indexOf(score);
+  if (rank === -1) return '#9d9d9d';
+  const colorIdx = Math.max(1, Math.min(8, unique.length <= 1 ? 4 : Math.round(rank / (unique.length - 1) * 7) + 1));
+  return colorMap[colorIdx];
+}
+
+// Build dungeon state from Blizzard API best_runs
+function buildDungeonState(bestRuns, dungeonList) {
   const st = {};
+  console.log('[debug] buildDungeonState: dungeonList slugs:', dungeonList.map(d => d.slug));
   dungeonList.forEach(d => {
     st[d.slug] = {
       name: d.name, slug: d.slug, short: d.short, timer: d.timer,
       icon: getDungeonIcon(d.slug),
-      fortified: { score: 0, keyLevel: 0, stars: 0 },
-      tyrannical: { score: 0, keyLevel: 0, stars: 0 },
+      best: { score: 0, keyLevel: 0, stars: 0 },
       totalScore: 0,
     };
   });
-  [...(bestRuns||[]), ...(altRuns||[])].forEach(run => {
-    const slug = run.dungeon?.slug || '';
-    const key = Object.keys(st).find(k => k === slug || st[k].name === run.dungeon?.name || st[k].short === run.short_name);
-    if (!key) return;
-    const aff = run.affixes?.[0]?.name?.toLowerCase()?.includes('tyrannical') ? 'tyrannical' : 'fortified';
-    const rs = run.score || calcRunScore(run.mythic_level, run.num_keystone_upgrades || 1);
-    if (rs > st[key][aff].score) {
-      st[key][aff] = { score: rs, keyLevel: run.mythic_level, stars: run.num_keystone_upgrades || 1 };
+  (bestRuns || []).forEach(run => {
+    const dungeonName = run.dungeon?.name || '';
+    const dungeonSlug = dungeonName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const key = Object.keys(st).find(k =>
+      k === dungeonSlug ||
+      st[k].name.toLowerCase() === dungeonName.toLowerCase() ||
+      dungeonSlug.includes(k) || k.includes(dungeonSlug)
+    );
+    if (!key) {
+      console.log(`[debug] NO MATCH for run dungeon "${dungeonName}" (slug: "${dungeonSlug}"). Known slugs:`, Object.keys(st));
+      return;
+    }
+    const k = key;
+    const kl = run.keystone_level || run.mythic_level || 0;
+    const rs = run.map_rating?.rating || 0;
+    // Calculate stars from duration vs dungeon timer (API keystone_upgrades is just 0/1)
+    const durationMs = run.duration || 0;
+    const timerMs = (st[k].timer || 2100) * 1000;
+    let stars = 0;
+    if (durationMs > 0 && timerMs > 0) {
+      if (durationMs <= timerMs * 0.6) stars = 3;
+      else if (durationMs <= timerMs * 0.8) stars = 2;
+      else if (durationMs <= timerMs) stars = 1;
+    } else if (run.keystone_upgrades > 0 || run.is_completed_within_time) {
+      stars = 1; // fallback if no duration data
+    }
+    console.log(`[debug]   ${k}: level=${kl}, stars=${stars}, rating=${rs}, duration=${durationMs}ms, timer=${timerMs}ms`);
+    // Keep the run with the highest rating; prefer timed runs (stars>0) when ratings are equal
+    if (rs > st[k].best.score || (rs === st[k].best.score && stars > st[k].best.stars)) {
+      st[k].best = { score: rs, keyLevel: kl, stars };
     }
   });
-  Object.keys(st).forEach(k => { st[k].totalScore = calcDungeonTotalScore(st[k].fortified.score, st[k].tyrannical.score); });
+  // totalScore = best run's rating directly (no more fort/tyran multiplier)
+  Object.keys(st).forEach(k => { st[k].totalScore = Math.round(st[k].best.score * 10) / 10; });
   return st;
 }
 
 function findPaths(ds, target, current, con, keys) {
   const diff = target - current;
-  if (diff <= 0) return { quickest: [], easiest: [], balanced: [] };
+  if (diff <= 0) return { quickest: [], easiest: [] };
   const cands = [];
   const dungeons = Object.values(ds).filter(d => !con.allowedDungeons?.length || con.allowedDungeons.includes(d.slug));
   const mk = con.maxKeyLevel || 30;
+  // Calculate character's max key level to limit star suggestions
+  const charMaxKey = Math.max(...dungeons.map(d => d.best.keyLevel || 0), 2);
   dungeons.forEach(d => {
-    ['fortified', 'tyrannical'].forEach(aff => {
-      const cur = d[aff];
-      for (let kl = Math.max(2, cur.keyLevel || 1); kl <= mk; kl++) {
-        for (let s = 1; s <= 3; s++) {
-          const ns = calcRunScore(kl, s);
-          if (ns <= cur.score) continue;
-          const nt = calcDungeonTotalScore(aff === 'fortified' ? ns : d.fortified.score, aff === 'tyrannical' ? ns : d.tyrannical.score);
-          const gain = nt - d.totalScore;
-          if (gain <= 0) continue;
-          const tl = d.timer || 2100;
-          cands.push({
-            dungeon: d.name, slug: d.slug, short: d.short, icon: d.icon,
-            affix: aff, keyLevel: kl, stars: s, runScore: ns, scoreGain: gain,
-            estTime: Math.round(s === 3 ? tl * 0.55 : s === 2 ? tl * 0.75 : tl * 0.95),
-            timerLimit: tl, affixes: getAffixesForLevel(kl, aff === 'fortified' ? 'Fortified' : 'Tyrannical'),
-          });
-        }
+    const cur = d.best;
+    for (let kl = 2; kl <= mk; kl++) {
+      // Only suggest 3-star if 10+ levels below max, 2-star if 5+ levels below
+      const levelsBelow = charMaxKey - kl;
+      let maxStars = 1;
+      if (levelsBelow >= 10) maxStars = 3;
+      else if (levelsBelow >= 5) maxStars = 2;
+      for (let s = 1; s <= maxStars; s++) {
+        const ns = calcRunScore(kl, s);
+        if (ns <= cur.score) continue;
+        const gain = Math.round((ns - cur.score) * 10) / 10;
+        if (gain <= 0) continue;
+        const tl = d.timer || 2100;
+        cands.push({
+          dungeon: d.name, slug: d.slug, short: d.short, icon: d.icon,
+          keyLevel: kl, stars: s, runScore: ns, scoreGain: gain,
+          estTime: Math.round(s === 3 ? tl * 0.55 : s === 2 ? tl * 0.75 : tl * 0.95),
+          timerLimit: tl, affixes: getAffixesForLevel(kl),
+        });
       }
-    });
+    }
   });
   let fc = cands;
   if (con.useKeystones && keys?.length) fc = cands.filter(c => keys.some(k => k.slug === c.slug && k.level === c.keyLevel));
-  return { quickest: greedyPath(fc, diff, 'eff'), easiest: greedyPath(fc, diff, 'easy'), balanced: greedyPath(fc, diff, 'bal') };
+  console.log('Total candidates generated:', fc.length);
+  console.log('Candidates by dungeon:', fc.reduce((acc, c) => {
+    if (!acc[c.slug]) acc[c.slug] = [];
+    acc[c.slug].push(`+${c.keyLevel}${c.stars > 1 ? '★'.repeat(c.stars) : '★'} = +${c.scoreGain}`);
+    return acc;
+  }, {}));
+  const quickest = greedyPath(fc, diff);
+  const quickestMaxKey = Math.max(...quickest.map(r => r.keyLevel), 0);
+  // Easiest: find the lowest max key level cap that can reach the target
+  let easiest = [];
+  for (let cap = 2; cap < quickestMaxKey; cap++) {
+    const capped = fc.filter(c => c.keyLevel <= cap);
+    const bestPerDungeon = {};
+    capped.forEach(c => {
+      if (!bestPerDungeon[c.slug] || c.scoreGain > bestPerDungeon[c.slug].scoreGain)
+        bestPerDungeon[c.slug] = c;
+    });
+    if (Object.values(bestPerDungeon).reduce((s, c) => s + c.scoreGain, 0) >= diff) {
+      easiest = greedyPath(capped, diff);
+      if (easiest.length) break;
+    }
+  }
+  if (!easiest.length) easiest = quickest;
+  return { quickest, easiest };
 }
 
-function greedyPath(cs, diff, strat) {
+function greedyPath(cs, diff) {
   if (!cs.length) return [];
-  let sorted;
-  if (strat === 'eff') sorted = [...cs].sort((a, b) => b.scoreGain - a.scoreGain || a.keyLevel - b.keyLevel);
-  else if (strat === 'easy') sorted = [...cs].sort((a, b) => a.keyLevel - b.keyLevel || b.scoreGain - a.scoreGain);
-  else sorted = [...cs].sort((a, b) => (b.scoreGain / (b.keyLevel || 1)) - (a.scoreGain / (a.keyLevel || 1)));
+
+  // Step 1: Pick dungeons by highest gain first (fewest runs needed)
+  // For easiest, candidates are already pre-filtered to lower key levels by the caller
+  const sorted = [...cs].sort((a, b) => b.scoreGain - a.scoreGain || a.keyLevel - b.keyLevel);
   const path = [], used = {};
   let rem = diff;
   for (const c of sorted) {
     if (rem <= 0) break;
-    const k = `${c.slug}-${c.affix}`;
-    if (used[k]) continue;
-    path.push({ ...c }); rem -= c.scoreGain; used[k] = true;
+    if (used[c.slug]) continue;
+    path.push({ ...c }); rem -= c.scoreGain; used[c.slug] = true;
   }
+  if (!path.length || rem > 0) return [];
+
+  // Step 2: Lower each dungeon to the minimum key level that still meets the target
+  const byDungeon = {};
+  cs.forEach(c => {
+    if (!used[c.slug]) return;
+    if (!byDungeon[c.slug]) byDungeon[c.slug] = [];
+    byDungeon[c.slug].push(c);
+  });
+  for (const slug of Object.keys(byDungeon)) {
+    byDungeon[slug].sort((a, b) => a.keyLevel - b.keyLevel || a.stars - b.stars);
+  }
+  let total = path.reduce((s, c) => s + c.scoreGain, 0);
+  for (let i = 0; i < path.length; i++) {
+    const options = byDungeon[path[i].slug];
+    if (!options) continue;
+    for (const opt of options) {
+      if (opt.keyLevel >= path[i].keyLevel) break;
+      if (total - path[i].scoreGain + opt.scoreGain >= diff) {
+        total = total - path[i].scoreGain + opt.scoreGain;
+        path[i] = { ...opt };
+        break;
+      }
+    }
+  }
+
   return path;
 }
 
 function saveToCookies(s) { try { document.cookie = `syrmplus_searches=${encodeURIComponent(JSON.stringify(s))}; expires=${new Date(Date.now()+7776e6).toUTCString()}; path=/; SameSite=Lax`; } catch(e){} }
 function loadFromCookies() { try { const m = document.cookie.match(/syrmplus_searches=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : []; } catch(e){ return []; } }
+function saveFormFieldsToCookies(charName, realm, region) { try { const data = { charName, realm, region }; document.cookie = `syrmplus_form=${encodeURIComponent(JSON.stringify(data))}; expires=${new Date(Date.now()+7776e6).toUTCString()}; path=/; SameSite=Lax`; } catch(e){} }
+function loadFormFieldsFromCookies() { try { const m = document.cookie.match(/syrmplus_form=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch(e){ return null; } }
 function clearCookies() { document.cookie = 'syrmplus_searches=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; }
 
 function RealmAutocomplete({ value, onChange, region, realmsData }) {
@@ -542,61 +918,48 @@ function ThemeToggle({ theme, onToggle }) {
   );
 }
 
-function StarBadge({ stars }) {
-  return <span className={`star-badge star-${stars}`}>{'★'.repeat(stars)}{'☆'.repeat(3-stars)}</span>;
-}
-
-function DungeonRunRow({ run, index }) {
+function PathRow({ dungeon, run, allScores, index }) {
   return (
-    <div className="dungeon-row fade-in" style={{ animationDelay: `${index*0.04}s` }}>
-      <img className="dungeon-thumb" src={run.icon} alt={run.dungeon}
-        onError={e => { if (!e.target.dataset.errored) { e.target.dataset.errored = 'true'; e.target.src = `https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(run.short||'?')}`; } }} />
-      <div className="dungeon-info">
-        <div className="dungeon-name">{run.dungeon} <span className="key-level-badge">+{run.keyLevel}</span></div>
-        <div className="dungeon-meta">
-          <StarBadge stars={run.stars} />
-          <span className="time-info">~{formatTime(run.estTime)} / {formatTime(run.timerLimit)}</span>
-          <span style={{ color: run.affix==='fortified'?'#4ade80':'#c084fc', fontSize:11, fontWeight:600 }}>
-            {run.affix==='fortified'?'Fort':'Tyr'}
-          </span>
-        </div>
-        <div className="affix-badges" style={{ marginTop: 4 }}>
-          {(run.affixes||[]).map((a,i) => <span key={i} className="affix-badge">{a}</span>)}
+    <div className="path-row fade-in" style={{ animationDelay: `${index*0.04}s` }}>
+      <div className="path-current">
+        <img className="path-thumb" src={dungeon.icon} alt={dungeon.name}
+          onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/40x40/2c2d33/5b9cf5?text=${encodeURIComponent(dungeon.short||'?')}`;}}}/>
+        <div className="path-current-info">
+          <div className="path-dungeon-name">{dungeon.name}</div>
         </div>
       </div>
-      <div className="dungeon-score-col">
-        <div className="dungeon-score score-delta">+{run.scoreGain}</div>
-        <div className="dungeon-score-label">score gain</div>
+      <div className="path-arrow-col">
+        <span className="path-arrow-symbol">→</span>
+      </div>
+      <div className="path-suggest">
+        <div className="path-suggest-run">
+          <span className="path-key">+{run.keyLevel}</span>
+          {run.stars > 0 && <span className="path-stars">{'★'.repeat(run.stars)}</span>}
+        </div>
+        <span className="path-suggest-time">~{formatTime(run.estTime)} / {formatTime(run.timerLimit)}</span>
+        <div className="path-suggest-gain">+{Math.round(run.scoreGain)}</div>
       </div>
     </div>
   );
 }
 
-function PathResults({ path, label, desc }) {
-  if (!path?.length) return (
-    <div className="card" style={{ marginBottom:16, textAlign:'center', padding:32 }}>
-      <div style={{ color:'var(--text-muted)', fontSize:14 }}>No path found. Try adjusting filters.</div>
-    </div>
-  );
-  const tg = path.reduce((s,r) => s+r.scoreGain, 0);
-  const tt = path.reduce((s,r) => s+r.estTime, 0);
-  const ak = (path.reduce((s,r) => s+r.keyLevel, 0)/path.length).toFixed(1);
+function CompactDungeonRow({ dungeon, allScores, index }) {
   return (
-    <div className="card fade-in" style={{ marginBottom:16 }}>
-      <div style={{ marginBottom:16 }}>
-        <div style={{ fontSize:15, fontWeight:600, marginBottom:4 }}>{label}</div>
-        <div style={{ fontSize:12, color:'var(--text-muted)' }}>{desc}</div>
+    <div className="compact-dungeon-row fade-in" style={{animationDelay:`${index*0.03}s`}}>
+      <img className="compact-dungeon-thumb" src={dungeon.icon} alt={dungeon.name}
+        onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/36x36/2c2d33/5b9cf5?text=${encodeURIComponent(dungeon.short)}`;}}}/>
+      <div className="compact-dungeon-info">
+        <span className="compact-dungeon-name">{dungeon.name}</span>
+        {dungeon.best.keyLevel > 0 ? (
+          <div className="compact-dungeon-meta">
+            <span className="compact-key-level">+{dungeon.best.keyLevel}</span>
+            {dungeon.best.stars > 0 && <span className="compact-stars">{'★'.repeat(dungeon.best.stars)}</span>}
+          </div>
+        ) : (
+          <span style={{color:'var(--text-muted)',fontSize:11}}>—</span>
+        )}
       </div>
-      <div className="path-summary">
-        <div className="path-stat"><div className="path-stat-value">+{tg}</div><div className="path-stat-label">Total Gain</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">{path.length}</div><div className="path-stat-label">Dungeons</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">~{formatTime(tt)}</div><div className="path-stat-label">Est. Time</div></div>
-        <div className="path-divider" />
-        <div className="path-stat"><div className="path-stat-value">+{ak}</div><div className="path-stat-label">Avg Key</div></div>
-      </div>
-      {path.map((r,i) => <DungeonRunRow key={i} run={r} index={i} />)}
+      <span className="compact-score" style={{color:getDungeonScoreColor(dungeon.totalScore, allScores)}}>{dungeon.totalScore.toFixed(1)}</span>
     </div>
   );
 }
@@ -609,7 +972,7 @@ function PrivacyModal({ onClose }) {
         <p><strong>What we store:</strong> When you save a search, we store the character name, realm, region, target score, and constraint settings in a browser cookie on your device.</p>
         <p><strong>What we do NOT store:</strong> No personal information, email addresses, IP addresses, or analytics data. No login system, tracking, or third-party sharing.</p>
         <p><strong>How cookies work here:</strong> A single cookie (<code>syrmplus_searches</code>) remembers your past searches so you can quickly re-run them. It is stored entirely on YOUR device.</p>
-        <p><strong>No server storage:</strong> All data stays in your browser. The only external requests go to the public Raider.io API.</p>
+        <p><strong>No server storage:</strong> All data stays in your browser. The only external requests go to the official Blizzard WoW API.</p>
         <p><strong>Deleting your data:</strong> Use "Clear All" in Saved Searches, or clear cookies in your browser settings.</p>
         <p><strong>Duration:</strong> Cookies expire after 90 days.</p>
         <p style={{ marginTop:16, paddingTop:12, borderTop:'1px solid var(--border)' }}><em>Last updated: {new Date().toLocaleDateString()}</em></p>
@@ -632,6 +995,7 @@ function App() {
   const [results, setResults] = useState(null);
   const [activeTab, setActiveTab] = useState('quickest');
   const [seasonName, setSeasonName] = useState('');
+  const [currentSeasonId, setCurrentSeasonId] = useState(null);
   const [allowedDungeons, setAllowedDungeons] = useState([]);
   const [maxKeyLevel, setMaxKeyLevel] = useState('');
   const [advancedMode, setAdvancedMode] = useState(false);
@@ -639,15 +1003,79 @@ function App() {
   const [savedSearches, setSavedSearches] = useState([]);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
-  const [showConstraints, setShowConstraints] = useState(false);
-  const [realmsData, setRealmsData] = useState(REALM_DATA);
-  const [realmsLoading, setRealmsLoading] = useState(false);
+  const [showDungeonFilter, setShowDungeonFilter] = useState(false);
+  const [showKeystoneSection, setShowKeystoneSection] = useState(false);
+  const [realmsData, setRealmsData] = useState({ us:[], eu:[], kr:[], tw:[] });
+  const [realmsLoading, setRealmsLoading] = useState(true);
   const [dungeonList, setDungeonList] = useState(FALLBACK_DUNGEONS);
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => { document.body.setAttribute('data-theme', theme); }, [theme]);
-  useEffect(() => { setSavedSearches(loadFromCookies()); }, []);
+  useEffect(() => { 
+    setSavedSearches(loadFromCookies()); 
+    const formFields = loadFormFieldsFromCookies();
+    if (formFields) {
+      setCharName(formFields.charName || '');
+      setRealm(formFields.realm || '');
+      setRegion(formFields.region || 'us');
+    }
+    hasInitializedRef.current = true;
+  }, []);
 
-  // Realm data is bundled directly (Raider.io /realms endpoint is no longer available)
+  // Auto-save character when a successful lookup occurs
+  useEffect(() => {
+    if (hasInitializedRef.current && charData && !loading) {
+      autoSaveCharacter();
+    }
+  }, [charData]);
+
+  // Fetch realm lists and current season dungeons from Blizzard API on mount
+  useEffect(() => {
+    async function go() {
+      setRealmsLoading(true);
+
+      // Fetch realms for all regions
+      const nd = { us:[], eu:[], kr:[], tw:[] };
+      for (const r of ['us','eu','kr','tw']) {
+        try {
+          const host = BLIZZARD_API_HOSTS[r];
+          const data = await fetchBlizzardApi(`https://${host}/data/wow/realm/index?namespace=dynamic-${r}&locale=en_US`);
+          if (data.realms && data.realms.length) {
+            nd[r] = data.realms
+              .filter(x => x.name && x.slug
+                && !/inst|auxiliary|test|tournament/i.test(x.name)
+                && !/inst|auxiliary|test|tournament/i.test(x.slug)
+                && !/^\d/.test(x.slug)
+                && !/[A-Z]{2}\d/.test(x.name))
+              .map(x => ({ name: x.name, slug: x.slug }))
+              .sort((a,b) => a.name.localeCompare(b.name));
+          }
+        } catch(e) {
+          console.log(`Failed to fetch ${r} realms:`, e);
+        }
+        if (!nd[r] || nd[r].length === 0) nd[r] = FALLBACK_REALMS[r] || [];
+      }
+      setRealmsData(nd);
+
+      // Fetch current season dungeon list dynamically
+      try {
+        const result = await fetchCurrentSeasonDungeons();
+        if (result?.dungeons?.length) {
+          setDungeonList(result.dungeons);
+          if (result.seasonId) {
+            setCurrentSeasonId(result.seasonId);
+            setSeasonName(getSeasonDisplayName(result.seasonId));
+          }
+          console.log(`Loaded ${result.dungeons.length} dungeons for season ${result.seasonId}:`, result.dungeons.map(d => d.name));
+        }
+      } catch(e) {
+        console.log('Using fallback dungeon list:', e);
+      }
+
+      setRealmsLoading(false);
+    }
+    go();
+  }, []);
 
   const toggleTheme = () => setTheme(t => t==='dark'?'light':'dark');
   const toggleDungeon = (slug) => setAllowedDungeons(p => p.includes(slug)?p.filter(s=>s!==slug):[...p,slug]);
@@ -666,50 +1094,153 @@ function App() {
     setLoading(true); setError(''); setCharData(null); setDungeonState(null); setResults(null);
     try {
       const slug = getRealmSlug(realm);
-      const url = `https://raider.io/api/v1/characters/profile?region=${region}&realm=${encodeURIComponent(slug)}&name=${encodeURIComponent(charName.trim())}&fields=mythic_plus_scores_by_season:current,mythic_plus_best_runs:all,mythic_plus_alternate_runs:all,gear`;
-      const resp = await fetchWithCorsFallback(url);
-      if (!resp.ok) {
-        if (resp.status===400||resp.status===404) throw new Error('Character not found. Check the name, realm, and region.');
-        throw new Error(`Raider.io API error (${resp.status})`);
+      const name = charName.trim().toLowerCase();
+      const host = BLIZZARD_API_HOSTS[region];
+      const ns = `profile-${region}`;
+
+      // Fetch character profile
+      const profile = await fetchBlizzardApi(
+        `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}?namespace=${ns}&locale=en_US`
+      );
+
+      // Fetch M+ keystone profile to get current rating and season list
+      let mpProfile = null;
+      try {
+        mpProfile = await fetchBlizzardApi(
+          `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile?namespace=${ns}&locale=en_US`
+        );
+      } catch(e) { console.log('No M+ profile:', e); }
+
+      // Get the current/latest season's best runs
+      let seasonData = null;
+      let charSeasonId = null;
+
+      // Log available seasons for debugging
+      if (mpProfile?.seasons?.length) {
+        const seasonIds = mpProfile.seasons.map(s => s.id);
+        console.log('[debug] Character has M+ data for seasons:', seasonIds);
+        console.log('[debug] App current season ID:', currentSeasonId);
+
+        // Prefer the known current season if the character has data for it
+        if (currentSeasonId && seasonIds.includes(currentSeasonId)) {
+          charSeasonId = currentSeasonId;
+        } else {
+          // Otherwise pick the highest season ID (most recent)
+          charSeasonId = Math.max(...seasonIds);
+        }
+        console.log('[debug] Using season ID:', charSeasonId);
       }
-      const data = await resp.json();
-      setCharData(data);
-      if (data.mythic_plus_scores_by_season?.[0]?.season) setSeasonName(data.mythic_plus_scores_by_season[0].season);
-      const best = data.mythic_plus_best_runs||[], alt = data.mythic_plus_alternate_runs||[];
-      let dl = FALLBACK_DUNGEONS;
-      if (best.length||alt.length) {
-        const seen = new Set(), apiD = [];
-        [...best,...alt].forEach(r => {
-          const s = r.dungeon?.slug;
-          if (s && !seen.has(s)) {
-            seen.add(s);
-            apiD.push({ slug:s, name:r.dungeon?.name||s, short:r.short_name||s.substring(0,4).toUpperCase(), timer:Math.round((r.par_time_ms||2100000)/1000) });
+      if (charSeasonId) {
+        try {
+          seasonData = await fetchBlizzardApi(
+            `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile/season/${charSeasonId}?namespace=${ns}&locale=en_US`
+          );
+          console.log('[debug] Season data best_runs count:', seasonData?.best_runs?.length);
+          if (seasonData?.best_runs?.length) {
+            console.log('[debug] Best runs dungeons:', seasonData.best_runs.map(r => r.dungeon?.name));
           }
-        });
-        if (apiD.length) { dl = apiD; setDungeonList(apiD); }
+        } catch(e) { console.log('Failed to fetch season data:', e); }
       }
-      setDungeonState(buildDungeonState(best, alt, dl));
+
+      // Fetch character media for avatar
+      let mediaData = null;
+      try {
+        mediaData = await fetchBlizzardApi(
+          `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/character-media?namespace=${ns}&locale=en_US`
+        );
+      } catch(e) { console.log('No character media:', e); }
+
+      // Transform into app-compatible format
+      const avatarAsset = mediaData?.assets?.find(a => a.key === 'avatar');
+      const mpRating = seasonData?.mythic_rating?.rating || mpProfile?.current_mythic_rating?.rating || 0;
+
+      const charInfo = {
+        name: profile.name,
+        realm: profile.realm?.name || realm,
+        region: region,
+        class: profile.character_class?.name || '',
+        active_spec_name: profile.active_spec?.name || '',
+        thumbnail_url: avatarAsset?.value || null,
+        mythic_plus_scores_by_season: [{ season: `season-${charSeasonId || 'current'}`, scores: { all: mpRating } }],
+      };
+      setCharData(charInfo);
+      if (charSeasonId) setSeasonName(getSeasonDisplayName(charSeasonId));
+
+      // Build dungeon state from best runs, using the already-loaded dungeon list
+      const bestRuns = seasonData?.best_runs || [];
+      setDungeonState(buildDungeonState(bestRuns, dungeonList));
     } catch(e) {
-      if (e.message?.includes('NetworkError')||e.message?.includes('Failed to fetch')||(e.name==='TypeError'&&e.message?.includes('fetch')))
-        setError('Network request blocked — please download the HTML file and open it directly in your browser.');
-      else setError(e.message||'Failed to look up character.');
+      if (e.message?.includes('NetworkError') || e.message?.includes('Failed to fetch') || (e.name==='TypeError' && e.message?.includes('fetch')))
+        setError('Network error — make sure python server.py is running with Blizzard API credentials.');
+      else setError(e.message || 'Failed to look up character.');
     } finally { setLoading(false); }
   }
 
   function calculatePaths() {
     if (!dungeonState) return;
-    const t = parseInt(targetScore)||0, c = charData?.mythic_plus_scores_by_season?.[0]?.scores?.all||0;
-    if (t<=c) { setError('Target score must be higher than current score.'); return; }
+    const t = parseInt(targetScore)||0, c = charData?.mythic_plus_scores_by_season?.[0]?.scores?.all || 0;
+    if (t <= c) { setError('Target score must be higher than current score.'); return; }
     setError('');
     const con = { allowedDungeons:allowedDungeons.length?allowedDungeons:null, maxKeyLevel:maxKeyLevel?parseInt(maxKeyLevel):null, useKeystones:advancedMode };
     const ks = advancedMode ? keystones.filter(k=>k.slug&&k.level).map(k=>({slug:k.slug,level:parseInt(k.level)})) : null;
-    setResults(findPaths(dungeonState, t, c, con, ks));
+    const r = findPaths(dungeonState, t, c, con, ks);
+    setResults(r);
     setActiveTab('quickest');
+    const totalGain = (r.quickest||[]).reduce((s,x) => s + x.scoreGain, 0);
+    if (totalGain < t - c) {
+      setError('Your current filters cannot reach the target score. Try raising the max key level or enabling more dungeons.');
+    }
+  }
+
+  async function handleSubmit() {
+    const charChanged = charData && (charName.trim().toLowerCase() !== charData.name.toLowerCase() || realm.trim().toLowerCase() !== charData.realm.toLowerCase());
+    if (charChanged) {
+      await lookupCharacter();
+    } else if (!dungeonState) {
+      await lookupCharacter();
+    } else {
+      calculatePaths();
+    }
   }
 
   function saveSearch() {
-    const s = { id:Date.now(), charName:charName.trim(), realm:realm.trim(), region, targetScore, allowedDungeons:[...allowedDungeons], maxKeyLevel, advancedMode, keystones:advancedMode?[...keystones]:[], savedAt:new Date().toISOString() };
-    const u = [s,...savedSearches].slice(0,10); setSavedSearches(u); saveToCookies(u);
+    const newSearch = { id:Date.now(), charName:charName.trim(), realm:realm.trim(), region, targetScore, allowedDungeons:[...allowedDungeons], maxKeyLevel, advancedMode, keystones:advancedMode?[...keystones]:[], savedAt:new Date().toISOString() };
+    // Check if this search already exists
+    const isDuplicate = savedSearches.some(s => 
+      s.charName === newSearch.charName && 
+      s.realm === newSearch.realm && 
+      s.region === newSearch.region && 
+      s.targetScore === newSearch.targetScore && 
+      JSON.stringify(s.allowedDungeons) === JSON.stringify(newSearch.allowedDungeons) &&
+      s.maxKeyLevel === newSearch.maxKeyLevel &&
+      s.advancedMode === newSearch.advancedMode
+    );
+    if (isDuplicate) { setError('This search has already been saved.'); return; }
+    const u = [newSearch,...savedSearches].slice(0,10); setSavedSearches(u); saveToCookies(u);
+  }
+
+  function autoSaveCharacter() {
+    const charNameTrim = charName.trim();
+    const realmTrim = realm.trim();
+    // Check if this character already exists in saved searches - if so, remove the old one
+    const existingIndex = savedSearches.findIndex(s => 
+      s.charName === charNameTrim && 
+      s.realm === realmTrim && 
+      s.region === region
+    );
+    let updatedSearches;
+    if (existingIndex !== -1) {
+      // Replace the existing entry
+      updatedSearches = [...savedSearches];
+      updatedSearches.splice(existingIndex, 1);
+      updatedSearches = [{ id:Date.now(), charName:charNameTrim, realm:realmTrim, region, targetScore:'', allowedDungeons:[], maxKeyLevel:'', advancedMode:false, keystones:[], savedAt:new Date().toISOString() }, ...updatedSearches];
+    } else {
+      // Add new entry
+      updatedSearches = [{ id:Date.now(), charName:charNameTrim, realm:realmTrim, region, targetScore:'', allowedDungeons:[], maxKeyLevel:'', advancedMode:false, keystones:[], savedAt:new Date().toISOString() }, ...savedSearches].slice(0,10);
+    }
+    setSavedSearches(updatedSearches);
+    saveToCookies(updatedSearches);
+    saveFormFieldsToCookies(charNameTrim, realmTrim, region);
   }
   function loadSearch(s) {
     setCharName(s.charName); setRealm(s.realm); setRegion(s.region);
@@ -725,8 +1256,13 @@ function App() {
 
   const formatSeasonName = (s) => {
     if (!s) return '';
+    // Handle both "TWW Season 2" and "season-tww-2" formats
+    if (s.startsWith('TWW')) return s;
     return s.replace(/-/g,' ').replace('season tww ','TWW Season ').replace('season df ','DF Season ').replace('season ','Season ').replace(/\b\w/g,c=>c.toUpperCase());
   };
+
+  const allScores = dungeonState ? Object.values(dungeonState).map(d => d.totalScore) : [];
+  const sortedDungeons = dungeonState ? Object.values(dungeonState).sort((a, b) => a.totalScore - b.totalScore) : [];
 
   return (
     <div>
@@ -737,160 +1273,246 @@ function App() {
             <h1><span>Syr's</span> M+ Score Goal Helper</h1>
           </div>
           <div className="header-actions">
-            <button className="btn btn-ghost btn-sm" onClick={()=>setShowSaved(!showSaved)}>📋 Saved ({savedSearches.length})</button>
+            <div style={{position:'relative'}}>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setShowSaved(!showSaved)}>📋 Saved ({savedSearches.length})</button>
+              {showSaved && (
+                <div style={{position:'absolute',top:'100%',right:0,background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',marginTop:4,minWidth:300,maxHeight:400,overflowY:'auto',boxShadow:'var(--shadow)',zIndex:100}}>
+                  {savedSearches.length === 0 ? (
+                    <div style={{padding:16,textAlign:'center',color:'var(--text-muted)',fontSize:13}}>No saved searches yet.</div>
+                  ) : (
+                    <div className="saved-list" style={{padding:8}}>
+                      {savedSearches.map(s=>(
+                        <div key={s.id} className="saved-item" style={{marginBottom:4}} onClick={()=>{loadSearch(s);setShowSaved(false);}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div className="saved-item-name">{s.charName} — {s.realm}</div>
+                            <div className="saved-item-meta">Target: {s.targetScore||'—'} · {s.region.toUpperCase()}</div>
+                          </div>
+                          <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();deleteSaved(s.id);}} style={{padding:'2px 6px'}}>✕</button>
+                        </div>
+                      ))}
+                      {savedSearches.length>0&&<button className="btn btn-danger btn-sm" onClick={clearAllSaved} style={{width:'100%',marginTop:8}}>Clear All</button>}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </div>
       </header>
       <main className="container">
-        <div className="section">
-          <div className="card">
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-              <div className="section-title" style={{ margin:0 }}><div className="dot" /> Character Lookup</div>
-              {seasonName && <div className="season-badge">🏰 {formatSeasonName(seasonName)}</div>}
-            </div>
-            <div className="search-grid">
-              <div className="input-group">
-                <label>Character Name</label>
-                <input className="input" placeholder="e.g. Syrsjr" value={charName}
-                  onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
-              </div>
-              <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
-              <div className="input-group">
-                <label>Region</label>
-                <select value={region} onChange={e=>setRegion(e.target.value)}>
-                  {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
-                </select>
-              </div>
-              <button className="btn btn-primary" onClick={lookupCharacter} disabled={loading} style={{alignSelf:'end'}}>
-                {loading?'...':'Look Up'}
-              </button>
-            </div>
-            {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Raider.io...</div>}
-            {charData && (
-              <div className="target-row">
-                <div className="input-group">
-                  <label>Target M+ Score</label>
-                  <input className="input mono" type="number" placeholder="e.g. 2500" value={targetScore} onChange={e=>setTargetScore(e.target.value)} />
+        {/* PRE-LOOKUP: centered search card */}
+        {!charData && (
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
+            <div className="section">
+              <div className="card">
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+                  <div className="section-title" style={{margin:0}}><div className="dot" /> Character Lookup</div>
+                  {seasonName && <div className="season-badge">🏰 {formatSeasonName(seasonName)}</div>}
                 </div>
-                <div style={{ display:'flex', gap:8, alignItems:'flex-end', flexWrap:'wrap' }}>
-                  <button className="btn btn-primary" onClick={calculatePaths} disabled={!targetScore}>Calculate Paths</button>
-                  <button className="btn btn-secondary" onClick={saveSearch}>💾 Save</button>
-                  <button className="btn btn-ghost btn-sm" onClick={()=>setShowConstraints(!showConstraints)}>
-                    ⚙️ {showConstraints?'Hide':'Filters'}
-                  </button>
+                <div className="search-grid full-width" style={{gridTemplateColumns:'60px 1fr 1fr'}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Region</label>
+                    <select value={region} onChange={e=>setRegion(e.target.value)} style={{fontSize:'14px',padding:'8px 12px'}}>
+                      {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
+                  </div>
+                  <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Character Name</label>
+                    <input className="input" placeholder="e.g. Syrsjr" value={charName}
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                  </div>
                 </div>
+                <button className="btn btn-lookup" onClick={lookupCharacter} disabled={loading} style={{width:'100%',marginTop:12}}>
+                  {loading?'...':'Look Up'}
+                </button>
+                {realmsLoading && <div className="info-msg" style={{marginTop:12}}>Loading realm lists from Blizzard API...</div>}
               </div>
-            )}
-            {showConstraints && charData && (
-              <div style={{ marginTop:20, paddingTop:16, borderTop:'1px solid var(--border)' }}>
-                <div className="constraints-grid">
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:500, color:'var(--text-secondary)', marginBottom:8 }}>
-                      Limit to Dungeons <span style={{ fontSize:11, color:'var(--text-muted)' }}>(leave unchecked for all)</span>
+            </div>
+            {loading && <div className="loading-spinner" />}
+            {error && <div className="error-msg" style={{marginTop:16}}>{error}</div>}
+          </div>
+        )}
+
+        {/* POST-LOOKUP: two-column layout */}
+        {charData && (
+          <div className="app-two-col">
+            {/* LEFT PANEL: search, filters */}
+            <div className="left-panel">
+              <div className="card condensed-form" style={{padding:16,marginBottom:12}}>
+                <div style={{display:'grid',gridTemplateColumns:'60px 1fr 1fr',gap:6,marginBottom:10}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Region</label>
+                    <select value={region} onChange={e=>setRegion(e.target.value)} style={{fontSize:'14px',padding:'8px 12px'}}>
+                      {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
+                  </div>
+                  <RealmAutocomplete value={realm} onChange={setRealm} region={region} realmsData={realmsData} />
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Character</label>
+                    <input className="input" placeholder="Name" value={charName}
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                  </div>
+                </div>
+
+                {/* Target score and Max Key Level on the same line */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:6}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Target M+ Score</label>
+                    <input className="input mono" type="number" step="1" placeholder="e.g. 2500" value={targetScore}
+                      onChange={e=>setTargetScore(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} />
+                  </div>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Max Key Level</label>
+                    <input className="input mono" type="number" step="1" placeholder="No limit" value={maxKeyLevel}
+                      onChange={e=>setMaxKeyLevel(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} min="2" max="30" />
+                  </div>
+                </div>
+
+                {/* Expandable: Limit to specific dungeons */}
+                <div className="expandable-header" onClick={()=>setShowDungeonFilter(!showDungeonFilter)}>
+                  <span className="expandable-icon">{showDungeonFilter?'−':'+'}</span>
+                  <span>Limit to specific dungeons</span>
+                </div>
+                <div className={`expandable-content${showDungeonFilter?' open':''}`}>
+                  <div className="dungeon-checkboxes" style={{gridTemplateColumns:'1fr',marginBottom:4,paddingLeft:22}}>
+                    {dungeonList.map(d=>(
+                      <label key={d.slug} className="checkbox-label" style={{fontSize:14}}>
+                        <input type="checkbox" checked={allowedDungeons.includes(d.slug)} onChange={()=>toggleDungeon(d.slug)} />
+                        {d.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Expandable: Restrict to specific keystones */}
+                <div className="expandable-header" onClick={()=>{setShowKeystoneSection(!showKeystoneSection); setAdvancedMode(!showKeystoneSection);}}>
+                  <span className="expandable-icon">{showKeystoneSection?'−':'+'}</span>
+                  <span>Restrict to specific keystones</span>
+                </div>
+                <div className={`expandable-content${showKeystoneSection?' open':''}`}>
+                  <div style={{paddingLeft:22,marginBottom:4}}>
+                    {keystones.map((k,i)=>(
+                      <div key={i} style={{display:'flex',gap:4,marginBottom:4,alignItems:'center'}}>
+                        <select value={k.slug} onChange={e=>updateKeystone(i,'slug',e.target.value)} style={{flex:1,fontSize:14,padding:'6px 8px'}}>
+                          <option value="">Dungeon...</option>
+                          {dungeonList.map(d=><option key={d.slug} value={d.slug}>{d.name}</option>)}
+                        </select>
+                        <input className="input mono" type="number" step="1" placeholder="+Lvl" value={k.level}
+                          onChange={e=>updateKeystone(i,'level',e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}}
+                          min="2" max="30" style={{width:50,fontSize:14,padding:'6px 8px'}} />
+                        <button className="btn btn-ghost btn-sm" onClick={()=>removeKeystone(i)} style={{padding:'2px 6px',fontSize:12}}>✕</button>
+                      </div>
+                    ))}
+                    <button className="btn btn-secondary btn-sm" onClick={addKeystone} style={{fontSize:11,padding:'4px 10px',marginTop:2}}>+ Add Key</button>
+                  </div>
+                </div>
+
+                {/* Submit button at the very bottom */}
+                <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={!targetScore || !charName.trim() || !realm.trim()} style={{flex:1,width:'100%',marginTop:16}}>
+                  Submit
+                </button>
+              </div>
+
+              {/* Character info and current dungeon scores - only shown after paths are calculated */}
+              {charData && dungeonState && results && (
+                <div className="card" style={{padding:16}}>
+                  {/* Character banner - no separate box */}
+                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                    {av && <img src={av} alt="avatar" style={{width:48,height:48,borderRadius:8,border:'2px solid var(--accent)',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}} />}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:16,fontWeight:700,color:'var(--text-primary)',marginBottom:2}}>{charData.name}</div>
+                      <div style={{fontSize:12,color:'var(--text-muted)',marginBottom:2}}>{charData.realm} — {charData.region?.toUpperCase()}</div>
+                      <div style={{fontSize:12,color:'var(--text-secondary)',display:'flex',gap:0}}>
+                        <span style={{color:getClassColor(charData.class)}}>{charData.active_spec_name} {charData.class}</span>
+                      </div>
                     </div>
-                    <div className="dungeon-checkboxes">
-                      {dungeonList.map(d=>(
-                        <label key={d.slug} className="checkbox-label">
-                          <input type="checkbox" checked={allowedDungeons.includes(d.slug)} onChange={()=>toggleDungeon(d.slug)} />
-                          {d.short||d.name}
-                        </label>
-                      ))}
+                    <div style={{textAlign:'right',flexShrink:0}}>
+                      <div className="overall-score-num" style={{fontSize:24,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono', monospace"}}>{cs.toFixed(1)}</div>
                     </div>
                   </div>
-                  <div>
-                    <div className="input-group">
-                      <label>Max Key Level</label>
-                      <input className="input mono" type="number" placeholder="No limit" value={maxKeyLevel} onChange={e=>setMaxKeyLevel(e.target.value)} min="2" max="40" />
+                  
+                  {/* Current dungeon scores */}
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:6}}>Current Scores</div>
+                  {sortedDungeons.map((d,i)=>(
+                    <CompactDungeonRow key={d.slug} dungeon={d} allScores={allScores} index={i} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT PANEL: path results */}
+            <div className="right-panel">
+              {loading && <div className="loading-spinner" />}
+              {error && <div className="error-msg" style={{marginBottom:16}}>{error}</div>}
+              {results && !error.includes('cannot reach the target score') ? (() => {
+                const currentPath = results[activeTab] || results.quickest || [];
+                const sortedPath = [...currentPath].sort((a,b) => b.scoreGain - a.scoreGain);
+                return (
+                  <div className="section fade-in">
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+                      <div className="section-title" style={{margin:0}}><div className="dot" /> Path to {targetScore}</div>
+                      <div style={{fontSize:13,color:'var(--text-secondary)'}}>
+                        Need <strong style={{color:'var(--success)'}}>+{(parseInt(targetScore)-cs).toFixed(0)}</strong> more
+                      </div>
                     </div>
-                    <div className="toggle-row">
-                      <input type="checkbox" checked={advancedMode} onChange={e=>setAdvancedMode(e.target.checked)} style={{accentColor:'var(--accent)'}} />
-                      <span className="toggle-label">Advanced: Use Group Keystones</span>
+                    <div className="tabs" style={{marginBottom:16}}>
+                      <button className={`tab ${activeTab==='quickest'?'active':''}`} onClick={()=>setActiveTab('quickest')}>⚡ Quickest</button>
+                      <button className={`tab ${activeTab==='easiest'?'active':''}`} onClick={()=>setActiveTab('easiest')}>🌿 Easiest</button>
                     </div>
-                    {advancedMode && (
-                      <div style={{marginTop:12}}>
-                        <div style={{fontSize:12,color:'var(--text-muted)',marginBottom:8}}>Enter your group's available keystones:</div>
-                        {keystones.map((k,i)=>(
-                          <div key={i} className="keystone-grid">
-                            <select value={k.slug} onChange={e=>updateKeystone(i,'slug',e.target.value)}>
-                              <option value="">Select dungeon...</option>
-                              {dungeonList.map(d=><option key={d.slug} value={d.slug}>{d.short||d.name}</option>)}
-                            </select>
-                            <input className="input mono" type="number" placeholder="+Lvl" value={k.level} onChange={e=>updateKeystone(i,'level',e.target.value)} min="2" max="40" />
-                            <button className="btn btn-ghost btn-sm" onClick={()=>removeKeystone(i)}>✕</button>
-                          </div>
-                        ))}
-                        <button className="btn btn-secondary btn-sm" onClick={addKeystone} style={{marginTop:4}}>+ Add Key</button>
+                    {sortedPath.length > 0 ? (
+                      sortedPath.map((run,i) => {
+                        const dungeon = dungeonState[run.slug];
+                        if (!dungeon) return null;
+                        return <PathRow key={run.slug} dungeon={dungeon} run={run} allScores={allScores} index={i} />;
+                      })
+                    ) : (
+                      <div className="card" style={{textAlign:'center',padding:32,color:'var(--text-muted)',fontSize:14}}>
+                        No path found. Try adjusting filters.
                       </div>
                     )}
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        {error && <div className="error-msg" style={{marginBottom:24}}>{error}</div>}
-        {loading && <div className="loading-spinner" />}
-        {charData && !loading && (
-          <div className="section fade-in">
-            <div className="card current-score-card">
-              {av && <img className="avatar" src={av} alt="avatar" onError={e=>{e.target.style.display='none';}} />}
-              <div className="char-details">
-                <div className="char-name">{charData.name}</div>
-                <div className="char-realm">{charData.realm} — {charData.region?.toUpperCase()}</div>
-                <div className="char-class">
-                  {charData.active_spec_name} {charData.class}
-                  {charData.gear?.item_level_equipped?` • ${charData.gear.item_level_equipped} ilvl`:''}
-                </div>
-              </div>
-              <div className="current-score-display">
-                <div className="current-score-num" style={{color:getScoreColor(cs)}}>{cs.toFixed(1)}</div>
-                <div className="current-score-label">Current M+ Score</div>
-              </div>
-            </div>
-            {dungeonState && (
-              <div style={{marginTop:8}}>
-                <div className="section-title"><div className="dot" /> Current Dungeon Scores</div>
-                {Object.values(dungeonState).map((d,i)=>(
-                  <div key={d.slug} className="dungeon-row fade-in" style={{animationDelay:`${i*0.03}s`}}>
-                    <img className="dungeon-thumb" src={d.icon} alt={d.name}
-                      onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.src=`https://via.placeholder.com/48x48/2c2d33/5b9cf5?text=${encodeURIComponent(d.short)}`;}}}/>
-                    <div className="dungeon-info">
-                      <div className="dungeon-name">{d.name}</div>
-                      <div className="dungeon-meta">
-                        {d.fortified.keyLevel>0&&<span><span style={{color:'#4ade80',fontWeight:600,fontSize:11}}>Fort</span> +{d.fortified.keyLevel} <StarBadge stars={d.fortified.stars||1} /></span>}
-                        {d.tyrannical.keyLevel>0&&<span><span style={{color:'#c084fc',fontWeight:600,fontSize:11}}>Tyr</span> +{d.tyrannical.keyLevel} <StarBadge stars={d.tyrannical.stars||1} /></span>}
-                        {d.fortified.keyLevel===0&&d.tyrannical.keyLevel===0&&<span style={{color:'var(--text-muted)',fontSize:12}}>Not completed</span>}
-                      </div>
+                );
+              })() : !results && dungeonState ? (
+                <div className="card fade-in" style={{padding:24}}>
+                  {/* Character banner — larger display in the wide panel */}
+                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20,paddingBottom:16,borderBottom:'1px solid var(--border)'}}>
+                    {av && <img src={av} alt="avatar" style={{width:64,height:64,borderRadius:12,border:'2px solid var(--accent)',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}} />}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:22,fontWeight:700,color:'var(--text-primary)',marginBottom:2}}>{charData.name}</div>
+                      <div style={{fontSize:13,color:'var(--text-muted)',marginBottom:2}}>{charData.realm} — {charData.region?.toUpperCase()}</div>
+                      <div style={{fontSize:13}}><span style={{color:getClassColor(charData.class)}}>{charData.active_spec_name} {charData.class}</span></div>
+                      {seasonName && <div className="season-badge" style={{marginTop:6,display:'inline-flex'}}>{formatSeasonName(seasonName)}</div>}
                     </div>
-                    <div className="dungeon-score-col">
-                      <div className="dungeon-score" style={{color:getScoreColor(d.totalScore*8)}}>{d.totalScore}</div>
-                      <div className="dungeon-score-label">dungeon score</div>
+                    <div style={{textAlign:'right',flexShrink:0}}>
+                      <div className="overall-score-num" style={{fontSize:44,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono',monospace",lineHeight:1}}>{cs.toFixed(1)}</div>
+                      <div style={{fontSize:12,color:'var(--text-muted)',marginTop:4}}>M+ Score</div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  {/* Current dungeon scores in a 2-column grid */}
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:8}}>Current Scores</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+                    {sortedDungeons.map((d,i)=>(
+                      <CompactDungeonRow key={d.slug} dungeon={d} allScores={allScores} index={i} />
+                    ))}
+                  </div>
+                  <div className="info-msg" style={{marginTop:16,textAlign:'center'}}>
+                    Enter a target score in the left panel and click <strong>Submit</strong> to see suggested paths.
+                  </div>
+                </div>
+              ) : (
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:200,color:'var(--text-muted)',fontSize:14}}>
+                  Enter a target score and click Submit to see suggested paths.
+                </div>
+              )}
+            </div>
           </div>
         )}
-        {results && (
-          <div className="section fade-in">
-            <div className="section-title"><div className="dot" /> Paths to {targetScore} Score</div>
-            <div style={{marginBottom:4,fontSize:13,color:'var(--text-muted)'}}>
-              Need <strong style={{color:'var(--success)'}}>+{(parseInt(targetScore)-cs).toFixed(0)}</strong> more score
-            </div>
-            <div className="tabs">
-              <button className={`tab ${activeTab==='quickest'?'active':''}`} onClick={()=>setActiveTab('quickest')}>⚡ Quickest</button>
-              <button className={`tab ${activeTab==='balanced'?'active':''}`} onClick={()=>setActiveTab('balanced')}>⚖️ Balanced</button>
-              <button className={`tab ${activeTab==='easiest'?'active':''}`} onClick={()=>setActiveTab('easiest')}>🌿 Easiest</button>
-            </div>
-            {activeTab==='quickest'&&<PathResults path={results.quickest} label="⚡ Quickest Path" desc="Fewest runs — max score gain per dungeon" />}
-            {activeTab==='balanced'&&<PathResults path={results.balanced} label="⚖️ Balanced Path" desc="Best score gain to key difficulty ratio" />}
-            {activeTab==='easiest'&&<PathResults path={results.easiest} label="🌿 Easiest Path" desc="Lowest keys possible — may need more runs" />}
-          </div>
-        )}
-        {showSaved && (
-          <div className="section fade-in">
+
+        {/* Saved searches */}
+        {showSaved && !charData && (
+          <div style={{maxWidth:600,margin:'24px auto 0'}}>
             <div className="card">
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
                 <div className="section-title" style={{margin:0}}><div className="dot" /> Saved Searches</div>
@@ -904,7 +1526,7 @@ function App() {
                     <div key={s.id} className="saved-item" onClick={()=>loadSearch(s)}>
                       <div>
                         <div className="saved-item-name">{s.charName} — {s.realm} ({s.region.toUpperCase()})</div>
-                        <div className="saved-item-meta">Target: {s.targetScore||'—'} • {new Date(s.savedAt).toLocaleDateString()}</div>
+                        <div className="saved-item-meta">Target: {s.targetScore||'—'} · {new Date(s.savedAt).toLocaleDateString()}</div>
                       </div>
                       <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();deleteSaved(s.id);}}>✕</button>
                     </div>
@@ -916,7 +1538,7 @@ function App() {
         )}
       </main>
       <footer className="footer">
-        <p>Syr's M+ Score Goal Helper — Data from <a href="https://raider.io" target="_blank" rel="noopener noreferrer">Raider.io</a> • <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
+        <p>Syr's M+ Score Goal Helper — Data from <a href="https://develop.battle.net/" target="_blank" rel="noopener noreferrer">Blizzard WoW API</a> · <a onClick={()=>setShowPrivacy(true)}>Privacy Policy</a></p>
         <p style={{marginTop:4}}>Score calculations are approximate. Dungeon list and season update automatically from the API.</p>
       </footer>
       {showPrivacy && <PrivacyModal onClose={()=>setShowPrivacy(false)} />}
