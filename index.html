@@ -1333,7 +1333,7 @@ function App() {
                   <div className="input-group" style={{marginBottom:0}}>
                     <label>Character Name</label>
                     <input className="input" placeholder="e.g. Syrsjr" value={charName}
-                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&handleSubmit()} />
                   </div>
                 </div>
                 <button className="btn btn-lookup" onClick={lookupCharacter} disabled={loading} style={{width:'100%',marginTop:12}}>
@@ -1364,7 +1364,7 @@ function App() {
                   <div className="input-group" style={{marginBottom:0}}>
                     <label>Character</label>
                     <input className="input" placeholder="Name" value={charName}
-                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&handleSubmit()} />
                   </div>
                 </div>
 
