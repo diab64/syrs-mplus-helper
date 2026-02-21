@@ -1179,7 +1179,9 @@ function App() {
 
       // Build dungeon state from best runs, using the already-loaded dungeon list
       const bestRuns = seasonData?.best_runs || [];
-      setDungeonState(buildDungeonState(bestRuns, dungeonList));
+      const newDungeonState = buildDungeonState(bestRuns, dungeonList);
+      setDungeonState(newDungeonState);
+      return { newDungeonState, charInfo };
     } catch(e) {
       if (e.message?.includes('NetworkError') || e.message?.includes('Failed to fetch') || (e.name==='TypeError' && e.message?.includes('fetch')))
         setError('Network error — make sure python server.py is running with Blizzard API credentials.');
@@ -1187,14 +1189,14 @@ function App() {
     } finally { setLoading(false); }
   }
 
-  function calculatePaths() {
-    if (!dungeonState) return;
-    const t = parseInt(targetScore)||0, c = charData?.mythic_plus_scores_by_season?.[0]?.scores?.all || 0;
+  function calculatePaths(ds = dungeonState, cd = charData) {
+    if (!ds) return;
+    const t = parseInt(targetScore)||0, c = cd?.mythic_plus_scores_by_season?.[0]?.scores?.all || 0;
     if (t <= c) { setError('Target score must be higher than current score.'); return; }
     setError('');
     const con = { allowedDungeons:allowedDungeons.length?allowedDungeons:null, maxKeyLevel:maxKeyLevel?parseInt(maxKeyLevel):null, useKeystones:advancedMode };
     const ks = advancedMode ? keystones.filter(k=>k.slug&&k.level).map(k=>({slug:k.slug,level:parseInt(k.level)})) : null;
-    const r = findPaths(dungeonState, t, c, con, ks);
+    const r = findPaths(ds, t, c, con, ks);
     setResults(r);
     setActiveTab('quickest');
     const totalGain = (r.quickest||[]).reduce((s,x) => s + x.scoreGain, 0);
@@ -1205,10 +1207,9 @@ function App() {
 
   async function handleSubmit() {
     const charChanged = charData && (charName.trim().toLowerCase() !== charData.name.toLowerCase() || realm.trim().toLowerCase() !== charData.realm.toLowerCase());
-    if (charChanged) {
-      await lookupCharacter();
-    } else if (!dungeonState) {
-      await lookupCharacter();
+    if (charChanged || !dungeonState) {
+      const result = await lookupCharacter();
+      if (result && targetScore) calculatePaths(result.newDungeonState, result.charInfo);
     } else {
       calculatePaths();
     }
