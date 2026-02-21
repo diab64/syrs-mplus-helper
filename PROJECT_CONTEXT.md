@@ -180,12 +180,7 @@ python server.py
 ## Known Issues / TODOs
 
 - Score estimation (`calcRunScore`) uses an approximation, not Blizzard's exact formula — acceptable for path suggestions
-- Score estimation (`calcRunScore`) uses an approximation, not Blizzard's exact formula
 - Dungeon icon slug mismatches handled by a manual map (`DUNGEON_IMAGE_SLUGS`) — may need updates for new seasons
-- `deploy-pages.yml` (GitHub Pages) deploys but the site won't function without a proxy backend
-- Vercel deployment not yet tested end-to-end with Blizzard credentials
-- Cloudflare Worker deployment not yet re-tested since Blizzard migration
-- `vercel.json` no longer needs a `buildCommand` — `index.html` is already the right filename
 
 ---
 
