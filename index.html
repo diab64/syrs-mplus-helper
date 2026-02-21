@@ -559,21 +559,11 @@ async function fetchCurrentSeasonDungeons() {
             return { dungeons, seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
           }
         }
-      } catch(e) {
-        console.log('Leaderboard approach failed, using season periods:', e);
-      }
-    }
-
-    // Fallback: extract dungeons from season detail periods if available
-    if (seasonDetail?.periods?.length) {
-      // Season periods list the dungeon rotation
-      console.log('Season detail has', seasonDetail.periods.length, 'periods');
+      } catch(e) {}
     }
 
     return { dungeons: [], seasonId: currentSeason, seasonName: seasonDetail?.season_name || null };
-  } catch(e) {
-    console.log('Failed to fetch current season dungeons:', e);
-  }
+  } catch(e) {}
   return null;
 }
 
@@ -710,7 +700,6 @@ function getDungeonScoreColor(score, allScores, scoreIndex) {
 // Build dungeon state from Blizzard API best_runs
 function buildDungeonState(bestRuns, dungeonList) {
   const st = {};
-  console.log('[debug] buildDungeonState: dungeonList slugs:', dungeonList.map(d => d.slug));
   dungeonList.forEach(d => {
     st[d.slug] = {
       name: d.name, slug: d.slug, short: d.short, timer: d.timer,
@@ -727,10 +716,7 @@ function buildDungeonState(bestRuns, dungeonList) {
       st[k].name.toLowerCase() === dungeonName.toLowerCase() ||
       dungeonSlug.includes(k) || k.includes(dungeonSlug)
     );
-    if (!key) {
-      console.log(`[debug] NO MATCH for run dungeon "${dungeonName}" (slug: "${dungeonSlug}"). Known slugs:`, Object.keys(st));
-      return;
-    }
+    if (!key) return;
     const k = key;
     const kl = run.keystone_level || run.mythic_level || 0;
     const rs = run.map_rating?.rating || 0;
@@ -745,7 +731,6 @@ function buildDungeonState(bestRuns, dungeonList) {
     } else if (run.keystone_upgrades > 0 || run.is_completed_within_time) {
       stars = 1; // fallback if no duration data
     }
-    console.log(`[debug]   ${k}: level=${kl}, stars=${stars}, rating=${rs}, duration=${durationMs}ms, timer=${timerMs}ms`);
     // Keep the run with the highest rating; prefer timed runs (stars>0) when ratings are equal
     if (rs > st[k].best.score || (rs === st[k].best.score && stars > st[k].best.stars)) {
       st[k].best = { score: rs, keyLevel: kl, stars };
@@ -789,12 +774,6 @@ function findPaths(ds, target, current, con, keys) {
   });
   let fc = cands;
   if (con.useKeystones && keys?.length) fc = cands.filter(c => keys.some(k => k.slug === c.slug && k.level === c.keyLevel));
-  console.log('Total candidates generated:', fc.length);
-  console.log('Candidates by dungeon:', fc.reduce((acc, c) => {
-    if (!acc[c.slug]) acc[c.slug] = [];
-    acc[c.slug].push(`+${c.keyLevel}${c.stars > 1 ? '★'.repeat(c.stars) : '★'} = +${c.scoreGain}`);
-    return acc;
-  }, {}));
   const quickest = greedyPath(fc, diff);
   const quickestMaxKey = Math.max(...quickest.map(r => r.keyLevel), 0);
   // Easiest: find the lowest max key level cap that can reach the target
@@ -1061,7 +1040,6 @@ function App() {
               .sort((a,b) => a.name.localeCompare(b.name));
           }
         } catch(e) {
-          console.log(`Failed to fetch ${r} realms:`, e);
         }
         if (!nd[r] || nd[r].length === 0) nd[r] = FALLBACK_REALMS[r] || [];
       }
@@ -1076,10 +1054,8 @@ function App() {
             setCurrentSeasonId(result.seasonId);
             setSeasonName(getSeasonDisplayName(result.seasonId));
           }
-          console.log(`Loaded ${result.dungeons.length} dungeons for season ${result.seasonId}:`, result.dungeons.map(d => d.name));
         }
       } catch(e) {
-        console.log('Using fallback dungeon list:', e);
       }
 
       setRealmsLoading(false);
@@ -1119,7 +1095,7 @@ function App() {
         mpProfile = await fetchBlizzardApi(
           `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile?namespace=${ns}&locale=en_US`
         );
-      } catch(e) { console.log('No M+ profile:', e); }
+      } catch(e) {}
 
       // Get the current/latest season's best runs
       let seasonData = null;
@@ -1128,8 +1104,6 @@ function App() {
       // Log available seasons for debugging
       if (mpProfile?.seasons?.length) {
         const seasonIds = mpProfile.seasons.map(s => s.id);
-        console.log('[debug] Character has M+ data for seasons:', seasonIds);
-        console.log('[debug] App current season ID:', currentSeasonId);
 
         // Prefer the known current season if the character has data for it
         if (currentSeasonId && seasonIds.includes(currentSeasonId)) {
@@ -1138,18 +1112,13 @@ function App() {
           // Otherwise pick the highest season ID (most recent)
           charSeasonId = Math.max(...seasonIds);
         }
-        console.log('[debug] Using season ID:', charSeasonId);
       }
       if (charSeasonId) {
         try {
           seasonData = await fetchBlizzardApi(
             `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/mythic-keystone-profile/season/${charSeasonId}?namespace=${ns}&locale=en_US`
           );
-          console.log('[debug] Season data best_runs count:', seasonData?.best_runs?.length);
-          if (seasonData?.best_runs?.length) {
-            console.log('[debug] Best runs dungeons:', seasonData.best_runs.map(r => r.dungeon?.name));
-          }
-        } catch(e) { console.log('Failed to fetch season data:', e); }
+        } catch(e) {}
       }
 
       // Fetch character media for avatar
@@ -1158,7 +1127,7 @@ function App() {
         mediaData = await fetchBlizzardApi(
           `https://${host}/profile/wow/character/${encodeURIComponent(slug)}/${encodeURIComponent(name)}/character-media?namespace=${ns}&locale=en_US`
         );
-      } catch(e) { console.log('No character media:', e); }
+      } catch(e) {}
 
       // Transform into app-compatible format
       const avatarAsset = mediaData?.assets?.find(a => a.key === 'avatar');
