@@ -1,61 +1,65 @@
-// Vercel serverless function to proxy Raider.io API requests
-// This avoids CORS issues and provides a backend for the static site
+// Vercel serverless function: proxy Blizzard API requests with OAuth2
+// Required env vars (set in Vercel dashboard → Settings → Environment Variables):
+//   BLIZZARD_CLIENT_ID
+//   BLIZZARD_CLIENT_SECRET
+
+// Note: token is cached per-instance (warm Vercel invocations reuse it)
+let tokenCache = { access_token: null, expires_at: 0 };
+
+async function getBlizzardToken() {
+  if (tokenCache.access_token && Date.now() / 1000 < tokenCache.expires_at - 60) {
+    return tokenCache.access_token;
+  }
+
+  const clientId = process.env.BLIZZARD_CLIENT_ID;
+  const clientSecret = process.env.BLIZZARD_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    throw new Error('BLIZZARD_CLIENT_ID and BLIZZARD_CLIENT_SECRET must be set in Vercel environment variables');
+  }
+
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const resp = await fetch('https://oauth.battle.net/token', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  if (!resp.ok) throw new Error(`Blizzard token request failed: ${resp.status}`);
+
+  const data = await resp.json();
+  tokenCache.access_token = data.access_token;
+  tokenCache.expires_at = Date.now() / 1000 + (data.expires_in || 86399);
+  return data.access_token;
+}
 
 export default async function handler(request, response) {
-  // Enable CORS
   response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
-  if (request.method === 'OPTIONS') {
-    return response.status(200).end();
-  }
+  if (request.method === 'OPTIONS') return response.status(200).end();
 
-  // Get target URL from query parameter
   const { url } = request.query;
+  if (!url) return response.status(400).json({ error: 'Missing url parameter' });
 
-  if (!url) {
-    return response.status(400).json({ error: 'Missing url query parameter' });
+  // Only allow Blizzard API domains
+  let parsed;
+  try { parsed = new URL(url); } catch { return response.status(400).json({ error: 'Invalid URL' }); }
+  if (!parsed.hostname.endsWith('.battle.net') && !parsed.hostname.endsWith('.blizzard.com')) {
+    return response.status(403).json({ error: 'Only Blizzard API domains are allowed' });
   }
 
   try {
-    // Make request to Raider.io with proper headers
-    const raiderResponse = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-      }
+    const token = await getBlizzardToken();
+    const upstream = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
     });
-
-    // Get response text
-    const text = await raiderResponse.text();
-
-    // Check if we got HTML instead of JSON (blocked)
-    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-      return response.status(403).json({
-        error: 'API returned HTML instead of JSON - likely blocked'
-      });
-    }
-
-    // Try to parse as JSON
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      return response.status(500).json({
-        error: 'Failed to parse API response as JSON'
-      });
-    }
-
-    // Return the data
-    return response.status(raiderResponse.status).json(data);
-
+    const data = await upstream.json();
+    return response.status(upstream.status).json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
-    return response.status(502).json({
-      error: 'Proxy error',
-      message: error.message
-    });
+    return response.status(502).json({ error: 'Proxy error', message: error.message });
   }
 }

@@ -166,7 +166,7 @@ select {
 .dungeon-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dungeon-score-col { text-align: right; min-width: 80px; }
 .dungeon-score { font-size: 20px; font-weight: 700; font-family: 'Chivo Mono', monospace; }
-[data-theme="light"] .dungeon-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+[data-theme="light"] .dungeon-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
 .dungeon-score-label { font-size: 11px; color: var(--text-secondary); }
 .star-badge {
   display: inline-flex; align-items: center; gap: 3px;
@@ -304,7 +304,7 @@ select {
   font-size: 15px; font-weight: 700; font-family: 'Chivo Mono', monospace;
   text-align: right; min-width: 50px; flex-shrink: 0;
 }
-[data-theme="light"] .compact-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+[data-theme="light"] .compact-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
 
 /* Two-column app layout (40/60 split) */
 .app-two-col {
@@ -367,7 +367,7 @@ select {
 .path-score {
   font-size: 16px; font-weight: 700; font-family: 'Chivo Mono', monospace;
 }
-[data-theme="light"] .path-score { text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+[data-theme="light"] .path-score { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
 .path-thumb {
   width: 40px; height: 40px; border-radius: 6px;
   object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg-input);
@@ -387,6 +387,21 @@ select {
 .path-suggest-gain {
   font-size: 18px; font-weight: 700; font-family: 'Chivo Mono', monospace;
   color: #4ade80;
+}
+[data-theme="light"] .path-suggest-gain { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+[data-theme="light"] .score-delta { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+[data-theme="light"] .overall-score-num { text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25); }
+
+/* Smooth expand/collapse for filter sections */
+.expandable-content {
+  overflow: hidden;
+  transition: max-height 0.28s ease, opacity 0.22s ease;
+  max-height: 0;
+  opacity: 0;
+}
+.expandable-content.open {
+  max-height: 500px;
+  opacity: 1;
 }
 
 @media (max-width: 900px) {
@@ -1306,7 +1321,7 @@ function App() {
                   <div className="input-group" style={{marginBottom:0}}>
                     <label>Character Name</label>
                     <input className="input" placeholder="e.g. Syrsjr" value={charName}
-                      onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
                   </div>
                 </div>
                 <button className="btn btn-lookup" onClick={lookupCharacter} disabled={loading} style={{width:'100%',marginTop:12}}>
@@ -1337,30 +1352,30 @@ function App() {
                   <div className="input-group" style={{marginBottom:0}}>
                     <label>Character</label>
                     <input className="input" placeholder="Name" value={charName}
-                      onChange={e=>setCharName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
+                      onChange={e=>{const v=e.target.value;setCharName(v?v[0].toUpperCase()+v.slice(1):v);}} onKeyDown={e=>e.key==='Enter'&&lookupCharacter()} />
                   </div>
                 </div>
 
-                {/* Target score field */}
-                <div className="input-group" style={{marginBottom:8}}>
-                  <label>Target M+ Score</label>
-                  <input className="input mono" type="number" step="1" placeholder="e.g. 2500" value={targetScore}
-                    onChange={e=>setTargetScore(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} />
+                {/* Target score and Max Key Level on the same line */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:6}}>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Target M+ Score</label>
+                    <input className="input mono" type="number" step="1" placeholder="e.g. 2500" value={targetScore}
+                      onChange={e=>setTargetScore(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} />
+                  </div>
+                  <div className="input-group" style={{marginBottom:0}}>
+                    <label>Max Key Level</label>
+                    <input className="input mono" type="number" step="1" placeholder="No limit" value={maxKeyLevel}
+                      onChange={e=>setMaxKeyLevel(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} min="2" max="30" />
+                  </div>
                 </div>
 
-                {/* Max key level - always visible */}
-                <div className="input-group" style={{marginBottom:6}}>
-                  <label>Max Key Level</label>
-                  <input className="input mono" type="number" step="1" placeholder="No limit" value={maxKeyLevel}
-                    onChange={e=>setMaxKeyLevel(e.target.value)} onKeyDown={e=>{if(e.key==='.'||e.key===',')e.preventDefault();}} min="2" max="30" />
-                </div>
-
-                {/* Expandable: Limit to Dungeons */}
+                {/* Expandable: Limit to specific dungeons */}
                 <div className="expandable-header" onClick={()=>setShowDungeonFilter(!showDungeonFilter)}>
                   <span className="expandable-icon">{showDungeonFilter?'−':'+'}</span>
-                  <span>Limit to Dungeons</span>
+                  <span>Limit to specific dungeons</span>
                 </div>
-                {showDungeonFilter && (
+                <div className={`expandable-content${showDungeonFilter?' open':''}`}>
                   <div className="dungeon-checkboxes" style={{gridTemplateColumns:'1fr',marginBottom:4,paddingLeft:22}}>
                     {dungeonList.map(d=>(
                       <label key={d.slug} className="checkbox-label" style={{fontSize:14}}>
@@ -1369,14 +1384,14 @@ function App() {
                       </label>
                     ))}
                   </div>
-                )}
+                </div>
 
                 {/* Expandable: Restrict to specific keystones */}
                 <div className="expandable-header" onClick={()=>{setShowKeystoneSection(!showKeystoneSection); setAdvancedMode(!showKeystoneSection);}}>
                   <span className="expandable-icon">{showKeystoneSection?'−':'+'}</span>
                   <span>Restrict to specific keystones</span>
                 </div>
-                {showKeystoneSection && (
+                <div className={`expandable-content${showKeystoneSection?' open':''}`}>
                   <div style={{paddingLeft:22,marginBottom:4}}>
                     {keystones.map((k,i)=>(
                       <div key={i} style={{display:'flex',gap:4,marginBottom:4,alignItems:'center'}}>
@@ -1392,7 +1407,7 @@ function App() {
                     ))}
                     <button className="btn btn-secondary btn-sm" onClick={addKeystone} style={{fontSize:11,padding:'4px 10px',marginTop:2}}>+ Add Key</button>
                   </div>
-                )}
+                </div>
 
                 {/* Submit button at the very bottom */}
                 <button className="btn btn-primary btn-sm" onClick={handleSubmit} disabled={!targetScore || !charName.trim() || !realm.trim()} style={{flex:1,width:'100%',marginTop:16}}>
@@ -1400,8 +1415,8 @@ function App() {
                 </button>
               </div>
 
-              {/* Character info and current dungeon scores - merged card */}
-              {charData && dungeonState && (
+              {/* Character info and current dungeon scores - only shown after paths are calculated */}
+              {charData && dungeonState && results && (
                 <div className="card" style={{padding:16}}>
                   {/* Character banner - no separate box */}
                   <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
@@ -1414,7 +1429,7 @@ function App() {
                       </div>
                     </div>
                     <div style={{textAlign:'right',flexShrink:0}}>
-                      <div style={{fontSize:24,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono', monospace"}}>{cs.toFixed(1)}</div>
+                      <div className="overall-score-num" style={{fontSize:24,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono', monospace"}}>{cs.toFixed(1)}</div>
                     </div>
                   </div>
                   
@@ -1459,9 +1474,36 @@ function App() {
                     )}
                   </div>
                 );
-              })() : (
+              })() : !results && dungeonState ? (
+                <div className="card fade-in" style={{padding:24}}>
+                  {/* Character banner — larger display in the wide panel */}
+                  <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:20,paddingBottom:16,borderBottom:'1px solid var(--border)'}}>
+                    {av && <img src={av} alt="avatar" style={{width:64,height:64,borderRadius:12,border:'2px solid var(--accent)',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}} />}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:22,fontWeight:700,color:'var(--text-primary)',marginBottom:2}}>{charData.name}</div>
+                      <div style={{fontSize:13,color:'var(--text-muted)',marginBottom:2}}>{charData.realm} — {charData.region?.toUpperCase()}</div>
+                      <div style={{fontSize:13}}><span style={{color:getClassColor(charData.class)}}>{charData.active_spec_name} {charData.class}</span></div>
+                      {seasonName && <div className="season-badge" style={{marginTop:6,display:'inline-flex'}}>{formatSeasonName(seasonName)}</div>}
+                    </div>
+                    <div style={{textAlign:'right',flexShrink:0}}>
+                      <div className="overall-score-num" style={{fontSize:44,fontWeight:700,color:getScoreColor(cs),fontFamily:"'Chivo Mono',monospace",lineHeight:1}}>{cs.toFixed(1)}</div>
+                      <div style={{fontSize:12,color:'var(--text-muted)',marginTop:4}}>M+ Score</div>
+                    </div>
+                  </div>
+                  {/* Current dungeon scores in a 2-column grid */}
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--text-secondary)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:8}}>Current Scores</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+                    {sortedDungeons.map((d,i)=>(
+                      <CompactDungeonRow key={d.slug} dungeon={d} allScores={allScores} index={i} />
+                    ))}
+                  </div>
+                  <div className="info-msg" style={{marginTop:16,textAlign:'center'}}>
+                    Enter a target score in the left panel and click <strong>Submit</strong> to see suggested paths.
+                  </div>
+                </div>
+              ) : (
                 <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:200,color:'var(--text-muted)',fontSize:14}}>
-                  Enter a target score and click Calculate to see suggested paths.
+                  Enter a target score and click Submit to see suggested paths.
                 </div>
               )}
             </div>

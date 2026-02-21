@@ -15,7 +15,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p site
-          cp syrs_mplus_helper.html site/index.html
+          cp index.html site/index.html
           cp README.md site/README.md || true
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3

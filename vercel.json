@@ -1,5 +1,4 @@
 {
-  "buildCommand": "cp syrs_mplus_helper.html index.html",
   "outputDirectory": ".",
   "github": {
     "silent": true

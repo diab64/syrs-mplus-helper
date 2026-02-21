@@ -2,5 +2,7 @@ name = "syrs-mplus-helper-proxy"
 main = "index.js"
 compatibility_date = "2026-02-13"
 
-# Secrets (encrypted environment variables):
-# - RAIDERIO_API_KEY: Set via wrangler secret put in GitHub Actions
+# Secrets (encrypted — never stored in this file):
+# Set manually:  wrangler secret put BLIZZARD_CLIENT_ID
+#                wrangler secret put BLIZZARD_CLIENT_SECRET
+# Or via GitHub Actions (CF_API_TOKEN, CF_ACCOUNT_ID, BLIZZARD_CLIENT_ID, BLIZZARD_CLIENT_SECRET)

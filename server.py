@@ -88,7 +88,7 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         if self.path == '/':
-            self.path = '/syrs_mplus_helper.html'
+            self.path = '/index.html'
 
         super().do_GET()
 
