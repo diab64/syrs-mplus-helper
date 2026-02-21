@@ -2,7 +2,7 @@
 
 > This file is the persistent memory for Claude sessions. Read it at the start of any new chat to get full context without re-reading the codebase. Update it when significant changes are made.
 
-**Last updated:** 2026-02-20 (renamed syrs_mplus_helper.html → index.html)
+**Last updated:** 2026-02-20 (GitHub Pages + Cloudflare Worker deployment live; UX fixes)
 
 ---
 
@@ -97,6 +97,9 @@ UI/UX features added in this phase:
 - Auto-capitalize first letter of character name inputs
 - Target M+ Score + Max Key Level on same line in filter panel
 - Stronger light-mode text shadows on colored score elements
+- Single-click submit always does full lookup + path calc when target score is set
+- Enter key submits from any input field (character name, realm, target score, max key level)
+- "points" label shown next to score gain (+xxx) in path suggestion panels
 
 ---
 
@@ -106,8 +109,8 @@ UI/UX features added in this phase:
 |--------|--------|-------|
 | **Local (`server.py`)** | ✅ Working | Needs `.env` with Blizzard credentials |
 | **Vercel** | ⚠️ Ready to try | `api/proxy.js` updated for Blizzard OAuth2. Set env vars in Vercel dashboard before deploying. |
-| **Cloudflare Worker** | ⚠️ Ready to try | `worker/index.js` is current. GitHub Actions workflow updated to push `BLIZZARD_CLIENT_ID` + `BLIZZARD_CLIENT_SECRET` secrets. Needs CF_API_TOKEN + CF_ACCOUNT_ID in GitHub Secrets. |
-| **GitHub Pages** | ❌ Broken | Static HTML deploys fine but Blizzard OAuth2 requires server-side secrets — character lookups will always fail without a backend proxy. |
+| **Cloudflare Worker** | ✅ Working | Deployed as `syrs-mplus-helper-proxy.diabtraders.workers.dev`. Secrets set via GitHub Actions (`CF_API_TOKEN`, `CF_ACCOUNT_ID`, `BLIZZARD_CLIENT_ID`, `BLIZZARD_CLIENT_SECRET`). |
+| **GitHub Pages** | ✅ Working | Serves static `index.html`; API calls routed to Cloudflare Worker proxy. Live at `https://diab64.github.io/syrs-mplus-helper/` |
 
 ---
 
