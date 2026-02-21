@@ -179,7 +179,7 @@ python server.py
 
 ## Known Issues / TODOs
 
-- `console.log` debug statements still throughout `index.html` — strip before production
+- Score estimation (`calcRunScore`) uses an approximation, not Blizzard's exact formula — acceptable for path suggestions
 - Score estimation (`calcRunScore`) uses an approximation, not Blizzard's exact formula
 - Dungeon icon slug mismatches handled by a manual map (`DUNGEON_IMAGE_SLUGS`) — may need updates for new seasons
 - `deploy-pages.yml` (GitHub Pages) deploys but the site won't function without a proxy backend
