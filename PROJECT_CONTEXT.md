@@ -2,7 +2,7 @@
 
 > This file is the persistent memory for Claude sessions. Read it at the start of any new chat to get full context without re-reading the codebase. Update it when significant changes are made.
 
-**Last updated:** 2026-02-20 (GitHub Pages + Cloudflare Worker deployment live; UX fixes)
+**Last updated:** 2026-02-20 (bug fixes, History panel, raider.io links, title nav)
 
 ---
 
@@ -100,6 +100,10 @@ UI/UX features added in this phase:
 - Single-click submit always does full lookup + path calc when target score is set
 - Enter key submits from any input field (character name, realm, target score, max key level)
 - "points" label shown next to score gain (+xxx) in path suggestion panels
+- History panel (formerly "Saved") in header dropdown only — duplicate main-content panel removed
+- History entries now save all filters (targetScore, maxKeyLevel, allowedDungeons, advancedMode, keystones)
+- Character banners (both small and large) link to raider.io character page in a new tab
+- Title click resets to landing page (clears character data and results)
 
 ---
 
