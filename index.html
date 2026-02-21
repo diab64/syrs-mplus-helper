@@ -628,6 +628,17 @@ async function fetchBlizzardApi(url) {
     return resp.json();
   }
 
+  // GitHub Pages → Cloudflare Worker proxy
+  if (window.location.hostname.endsWith('.github.io')) {
+    const workerProxy = 'https://syrs-mplus-helper-proxy.diabtraders.workers.dev?url=' + encodeURIComponent(url);
+    const resp = await fetch(workerProxy);
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+      throw new Error(err.error || `API error ${resp.status}`);
+    }
+    return resp.json();
+  }
+
   // Vercel serverless proxy
   try {
     const vercelProxy = '/api/proxy?url=' + encodeURIComponent(url);
