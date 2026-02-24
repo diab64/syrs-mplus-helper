@@ -423,6 +423,76 @@ select {
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* ===== Vault Tracker — warm amber/gold theme ===== */
+.vault-tracker { max-width: 960px; margin: 0 auto; }
+
+.vault-header-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid #d97706;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all var(--transition);
+}
+[data-theme="dark"] .vault-header-card { background: linear-gradient(135deg, #201d14 0%, #25262b 100%); border-color: #3d3420; }
+[data-theme="light"] .vault-header-card { background: linear-gradient(135deg, #fffbf0 0%, #fff 100%); border-color: #fde68a; border-left-color: #d97706; }
+
+.vault-char-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: all var(--transition);
+}
+[data-theme="dark"] .vault-char-card { background: linear-gradient(135deg, #1c1a17 0%, #25262b 100%); }
+
+.vault-run-cards { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+.vault-run-card {
+  position: relative;
+  width: 88px;
+  height: 112px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  transition: transform 0.15s ease;
+}
+.vault-run-card:hover { transform: translateY(-2px); }
+
+.vault-run-card.vault-slot-card {
+  border: 2px solid #d97706;
+  box-shadow: 0 0 10px rgba(217,119,6,0.3), inset 0 0 0 1px rgba(251,191,36,0.15);
+}
+.vault-run-card.empty-card { opacity: 0.4; border-style: dashed; }
+.vault-run-card.empty-card.vault-slot-card { border: 2px dashed #d97706; opacity: 0.5; }
+
+.vault-run-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; }
+.vault-run-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.1) 100%); }
+
+.vault-run-content {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 4px; gap: 1px;
+}
+.vault-slot-badge {
+  position: absolute; top: 4px; left: 4px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: #fbbf24; background: rgba(0,0,0,0.7);
+  padding: 1px 5px; border-radius: 4px;
+}
+.vault-run-level { font-size: 20px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); font-family: 'Chivo Mono', monospace; line-height: 1; }
+.vault-run-name { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.9); text-shadow: 0 1px 3px rgba(0,0,0,0.9); text-align: center; line-height: 1.2; max-width: 80px; }
+.vault-run-ilvl { font-size: 13px; font-weight: 700; color: #fbbf24; text-shadow: 0 1px 3px rgba(0,0,0,0.9); margin-top: 3px; }
+.vault-empty-icon { font-size: 22px; color: var(--text-muted); }
+
+.vault-status-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); font-family: 'Chivo Mono', monospace; }
+.vault-count { font-size: 13px; font-weight: 700; color: #d97706; }
 </style>
 </head>
 <body data-theme="dark">
@@ -842,6 +912,37 @@ function saveFormFieldsToCookies(charName, realm, region) { try { const data = {
 function loadFormFieldsFromCookies() { try { const m = document.cookie.match(/syrmplus_form=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : null; } catch(e){ return null; } }
 function clearCookies() { document.cookie = 'syrmplus_searches=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; }
 
+// --- Great Vault Tracker ---
+// Midnight Season 1 vault reward table (post stat-squish) — update when season changes
+// Source: https://www.wowhead.com/news/great-vault-reward-scaling-reverted-to-10-on-midnight-beta-379953
+const VAULT_ILVL_TABLE = { 2:259, 3:259, 4:263, 5:263, 6:266, 7:269, 8:269, 9:269 };
+const VAULT_ILVL_MAX_LEVEL = 10; // +10 and above reward VAULT_ILVL_MAX (Myth track)
+const VAULT_ILVL_MAX = 272;
+function getVaultIlvl(kl) { return kl >= VAULT_ILVL_MAX_LEVEL ? VAULT_ILVL_MAX : (VAULT_ILVL_TABLE[kl] || 0); }
+
+// Map Raider.IO short_name values to Blizzard zone image slugs for dungeon thumbnails
+const VAULT_DUNGEON_SLUG_MAP = {
+  'ARA': 'ara-kara-city-of-echoes',
+  'DAWN': 'the-dawnbreaker', 'DB': 'the-dawnbreaker',
+  'PSF': 'priory-of-the-sacred-flame',
+  'FLOOD': 'operation-floodgate',
+  'HOA': 'halls-of-atonement',
+  'ECO': 'eco-dome-aldani',
+  'STREETS': 'tazavesh-the-veiled-market', 'GAMBIT': 'tazavesh-the-veiled-market',
+  'MISTS': 'mists-of-tirna-scithe', 'SBG': 'sanguine-depths',
+  'NW': 'the-necrotic-wake', 'TOP': 'theater-of-pain',
+  'PF': 'plaguefall', 'SOA': 'spires-of-ascension',
+  'DOS': 'de-other-side', 'HoA': 'halls-of-atonement',
+};
+function getVaultDungeonThumb(run) {
+  const slug = VAULT_DUNGEON_SLUG_MAP[run.short_name] ||
+    (run.dungeon || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return `https://render.worldofwarcraft.com/us/zones/${slug}-small.jpg`;
+}
+
+function saveVaultCookies(chars) { try { document.cookie = `syrmplus_vault=${encodeURIComponent(JSON.stringify(chars))}; expires=${new Date(Date.now()+7776e6).toUTCString()}; path=/; SameSite=Lax`; } catch(e){} }
+function loadVaultCookies() { try { const m = document.cookie.match(/syrmplus_vault=([^;]+)/); return m ? JSON.parse(decodeURIComponent(m[1])) : []; } catch(e){ return []; } }
+
 function RealmAutocomplete({ value, onChange, region, realmsData, onSubmit }) {
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(-1);
@@ -971,8 +1072,198 @@ function PrivacyModal({ onClose }) {
   );
 }
 
+function VaultTracker({ realmsData }) {
+  const [vaultChars, setVaultChars] = useState([]);
+  const [charData, setCharData] = useState({});
+  const [inputRegion, setInputRegion] = useState('us');
+  const [inputRealm, setInputRealm] = useState('');
+  const [inputName, setInputName] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+
+  useEffect(() => {
+    const saved = loadVaultCookies();
+    if (saved.length) {
+      setVaultChars(saved);
+      saved.forEach(c => fetchChar(c));
+    }
+  }, []);
+
+  function getSlug(name, region) {
+    const rl = realmsData[region] || [];
+    const f = rl.find(r => r.name.toLowerCase() === name.trim().toLowerCase());
+    return f ? f.slug : name.trim().toLowerCase().replace(/'/g,'').replace(/\s+/g,'-');
+  }
+
+  async function fetchChar(c) {
+    const { id, region, realm, name } = c;
+    setCharData(prev => ({ ...prev, [id]: { ...(prev[id]||{}), loading: true, error: null } }));
+    try {
+      const slug = getSlug(realm, region);
+      const resp = await fetch(`https://raider.io/api/v1/characters/profile?region=${region}&realm=${encodeURIComponent(slug)}&name=${encodeURIComponent(name)}&fields=mythic_plus_weekly_highest_level_runs`);
+      if (!resp.ok) {
+        const e = await resp.json().catch(()=>({}));
+        throw new Error(e.message || `HTTP ${resp.status}`);
+      }
+      const data = await resp.json();
+      const runs = (data.mythic_plus_weekly_highest_level_runs || [])
+        .sort((a,b) => b.mythic_level - a.mythic_level || b.score - a.score)
+        .slice(0, 8);
+      setCharData(prev => ({
+        ...prev,
+        [id]: { loading: false, error: null, runs, info: { name: data.name, realm: data.realm, region: data.region, class: data.class, thumbnail_url: data.thumbnail_url } }
+      }));
+    } catch(e) {
+      setCharData(prev => ({ ...prev, [id]: { ...(prev[id]||{}), loading: false, error: e.message } }));
+    }
+  }
+
+  async function handleAdd() {
+    const name = inputName.trim(), realm = inputRealm.trim();
+    if (!name || !realm) { setAddError('Enter a character name and realm.'); return; }
+    if (vaultChars.find(c => c.name.toLowerCase()===name.toLowerCase() && c.realm.toLowerCase()===realm.toLowerCase() && c.region===inputRegion)) {
+      setAddError('This character is already in the list.'); return;
+    }
+    setAddLoading(true); setAddError('');
+    const nc = { id: Date.now(), region: inputRegion, realm, name };
+    try {
+      const slug = getSlug(realm, inputRegion);
+      const resp = await fetch(`https://raider.io/api/v1/characters/profile?region=${inputRegion}&realm=${encodeURIComponent(slug)}&name=${encodeURIComponent(name)}&fields=mythic_plus_weekly_highest_level_runs`);
+      if (!resp.ok) {
+        const e = await resp.json().catch(()=>({}));
+        throw new Error(e.message || 'Character not found');
+      }
+      const data = await resp.json();
+      const runs = (data.mythic_plus_weekly_highest_level_runs || [])
+        .sort((a,b) => b.mythic_level - a.mythic_level || b.score - a.score)
+        .slice(0, 8);
+      const updated = [...vaultChars, nc];
+      setVaultChars(updated);
+      saveVaultCookies(updated);
+      setCharData(prev => ({
+        ...prev,
+        [nc.id]: { loading: false, error: null, runs, info: { name: data.name, realm: data.realm, region: data.region, class: data.class, thumbnail_url: data.thumbnail_url } }
+      }));
+      setInputName('');
+    } catch(e) {
+      setAddError(e.message || 'Failed to add character.');
+    } finally {
+      setAddLoading(false);
+    }
+  }
+
+  function removeChar(id) {
+    const u = vaultChars.filter(c=>c.id!==id);
+    setVaultChars(u); saveVaultCookies(u);
+    setCharData(prev => { const n={...prev}; delete n[id]; return n; });
+  }
+
+  return (
+    <div className="vault-tracker">
+      <div className="vault-header-card">
+        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
+          <div className="section-title" style={{margin:0}}>
+            <div className="dot" style={{background:'#d97706'}}/>
+            <span style={{color:'#d97706'}}>Great Vault Tracker</span>
+          </div>
+          <span style={{fontSize:12,color:'var(--text-muted)'}}>Track weekly M+ runs and vault rewards for your group</span>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'60px 1fr 1fr auto',gap:8,alignItems:'end'}}>
+          <div className="input-group" style={{marginBottom:0}}>
+            <label>Region</label>
+            <select value={inputRegion} onChange={e=>setInputRegion(e.target.value)} style={{fontSize:'14px',padding:'8px 12px'}}>
+              {REGIONS.map(r=><option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </div>
+          <RealmAutocomplete value={inputRealm} onChange={setInputRealm} region={inputRegion} realmsData={realmsData} onSubmit={handleAdd} />
+          <div className="input-group" style={{marginBottom:0}}>
+            <label>Character Name</label>
+            <input className="input" placeholder="e.g. Syrlia" value={inputName}
+              onChange={e=>{const v=e.target.value;setInputName(v?v[0].toUpperCase()+v.slice(1):v);}}
+              onKeyDown={e=>e.key==='Enter'&&handleAdd()} />
+          </div>
+          <button className="btn" onClick={handleAdd} disabled={addLoading}
+            style={{height:42,alignSelf:'end',background:'#d97706',color:'#fff',border:'none'}}>
+            {addLoading?'...':'+ Add'}
+          </button>
+        </div>
+        {addError && <div className="error-msg" style={{marginTop:8}}>{addError}</div>}
+      </div>
+      {vaultChars.length === 0 ? (
+        <div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:14}}>
+          Add characters above to track their weekly vault progress.
+        </div>
+      ) : vaultChars.map(c => {
+        const d = charData[c.id];
+        const runs = d?.runs || [];
+        const info = d?.info;
+        const n = runs.length;
+        return (
+          <div key={c.id} className="vault-char-card fade-in">
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
+              {info?.thumbnail_url && <img src={info.thumbnail_url} alt="" style={{width:38,height:38,borderRadius:7,border:'2px solid #78350f80',objectFit:'cover',flexShrink:0}} onError={e=>{e.target.style.display='none';}} />}
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:15,color:info?getClassColor(info.class):'var(--text-primary)'}}>{info?.name||c.name}</div>
+                <div style={{fontSize:12,color:'var(--text-muted)'}}>{info?.realm||c.realm} — {(info?.region||c.region).toUpperCase()}</div>
+              </div>
+              <div style={{display:'flex',gap:4,alignItems:'center'}}>
+                {d?.loading && <div style={{width:14,height:14,border:'2px solid var(--border)',borderTopColor:'#d97706',borderRadius:'50%',animation:'spin 0.8s linear infinite'}} />}
+                {!d?.loading && <button className="btn btn-ghost btn-sm" onClick={()=>fetchChar(c)} style={{padding:'2px 6px',fontSize:12}} title="Refresh">↻</button>}
+                <button className="btn btn-ghost btn-sm" onClick={()=>removeChar(c.id)} style={{padding:'2px 6px',fontSize:12,color:'var(--danger)'}}>✕</button>
+              </div>
+            </div>
+            {d?.error && <div className="error-msg" style={{fontSize:12,marginBottom:8}}>{d.error}</div>}
+            {!d && <div style={{display:'flex',alignItems:'center',justifyContent:'center',padding:12}}><div style={{width:20,height:20,border:'3px solid var(--border)',borderTopColor:'#d97706',borderRadius:'50%',animation:'spin 0.8s linear infinite'}} /></div>}
+            {d && !d.loading && !d.error && (
+              <>
+                <div className="vault-status-row">
+                  <span className="vault-count">{n}/8</span>
+                  <span>runs this week</span>
+                  {n === 0 && <span style={{color:'var(--text-muted)',marginLeft:4}}>— no M+ completed yet</span>}
+                </div>
+                <div className="vault-run-cards">
+                  {Array.from({length:8}, (_, i) => {
+                    const run = runs[i];
+                    const isVaultSlot = i === 0 || i === 3 || i === 7;
+                    const slotNum = i === 0 ? 1 : i === 3 ? 2 : i === 7 ? 3 : null;
+                    const ilvl = isVaultSlot && run ? getVaultIlvl(run.mythic_level) : null;
+                    return (
+                      <div key={i} className={`vault-run-card${isVaultSlot ? ' vault-slot-card' : ''}${!run ? ' empty-card' : ''}`}>
+                        {run && (
+                          <>
+                            <img className="vault-run-img" src={getVaultDungeonThumb(run)} alt=""
+                              onError={e=>{if(!e.target.dataset.errored){e.target.dataset.errored='true';e.target.style.opacity='0';}}} />
+                            <div className="vault-run-overlay" />
+                          </>
+                        )}
+                        {isVaultSlot && <div className="vault-slot-badge">Slot {slotNum}</div>}
+                        <div className="vault-run-content">
+                          {run ? (
+                            <>
+                              <div className="vault-run-level">+{run.mythic_level}</div>
+                              <div className="vault-run-name">{run.short_name}</div>
+                              {ilvl && <div className="vault-run-ilvl">{ilvl}</div>}
+                            </>
+                          ) : (
+                            <div className="vault-empty-icon">○</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function App() {
   const [theme, setTheme] = useState('dark');
+  const [section, setSection] = useState('score');
   const [charName, setCharName] = useState('');
   const [realm, setRealm] = useState('');
   const [region, setRegion] = useState('us');
@@ -1282,6 +1573,14 @@ function App() {
         </div>
       </header>
       <main className="container">
+        <div className="tabs" style={{marginBottom:16}}>
+          <button className={`tab ${section==='score'?'active':''}`} onClick={()=>setSection('score')}>⚡ Score Helper</button>
+          <button className={`tab ${section==='vault'?'active':''}`} onClick={()=>setSection('vault')}>🏆 Vault Tracker</button>
+        </div>
+        {section === 'vault' ? (
+          <VaultTracker realmsData={realmsData} />
+        ) : (
+          <>
         {/* PRE-LOOKUP: centered search card */}
         {!charData && (
           <div style={{maxWidth:1000,margin:'0 auto'}}>
@@ -1490,7 +1789,8 @@ function App() {
             </div>
           </div>
         )}
-
+          </>
+        )}
 
       </main>
       <footer className="footer">
