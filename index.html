@@ -473,7 +473,7 @@ select {
   position: relative;
   flex: 1;
   min-width: 0;
-  height: 130px;
+  height: 150px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -513,8 +513,9 @@ select {
 .vault-run-ilvl.vault-ilvl-dim { color: rgba(251,191,36,0.65); font-size: 12px; }
 .vault-empty-icon { font-size: 22px; color: var(--text-muted); }
 
-.vault-status-row { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
-.vault-count { font-size: 16px; font-weight: 700; color: #d97706; font-family: 'Chivo Mono', monospace; }
+.vault-status-row { display: flex; align-items: baseline; gap: 5px; }
+.vault-count { font-size: 16px; font-weight: 700; font-family: 'Chivo Mono', monospace; }
+.vault-this-week { font-size: 12px; color: var(--text-secondary); }
 </style>
 </head>
 <body data-theme="dark">
@@ -587,6 +588,7 @@ const FALLBACK_DUNGEONS = [
 // Map API-generated slugs to WoW armory image slugs (only entries that differ)
 const DUNGEON_IMAGE_SLUGS = {
   'eco-dome-al-dani': 'eco-dome-aldani',
+  'tazavesh-streets-of-wonder': 'tazavesh-soleahs-gambit',
   'tazavesh-so-leah-s-gambit': 'tazavesh-soleahs-gambit',
 };
 
@@ -949,7 +951,7 @@ const VAULT_DUNGEON_SLUG_MAP = {
   'FLOOD': 'operation-floodgate',
   'HOA': 'halls-of-atonement',
   'ECO': 'eco-dome-aldani',
-  'STREETS': 'tazavesh-streets-of-wonder', 'GAMBIT': 'tazavesh-soleahs-gambit',
+  'STREETS': 'tazavesh-soleahs-gambit', 'GAMBIT': 'tazavesh-soleahs-gambit',
   'MISTS': 'mists-of-tirna-scithe', 'SBG': 'sanguine-depths',
   'NW': 'the-necrotic-wake', 'TOP': 'theater-of-pain',
   'PF': 'plaguefall', 'SOA': 'spires-of-ascension',
@@ -1225,22 +1227,23 @@ function VaultTracker({ realmsData }) {
             <div className="vault-char-info">
               {info?.thumbnail_url && (
                 <img src={info.thumbnail_url} alt=""
-                  style={{width:46,height:46,borderRadius:8,border:'2px solid #78350f80',objectFit:'cover',marginBottom:2}}
+                  style={{width:52,height:52,borderRadius:8,border:'2px solid #78350f80',objectFit:'cover',flexShrink:0}}
                   onError={e=>{e.target.style.display='none';}} />
               )}
-              <div style={{fontWeight:700,fontSize:14,color:info?getClassColor(info.class):'var(--text-primary)',lineHeight:1.2}}>{info?.name||c.name}</div>
-              <div style={{fontSize:11,color:'var(--text-muted)',lineHeight:1.3}}>{info?.realm||c.realm}</div>
-              <div style={{fontSize:11,color:'var(--text-muted)'}}>{(info?.region||c.region).toUpperCase()}</div>
+              <div style={{fontWeight:700,fontSize:16,color:info?getClassColor(info.class):'var(--text-primary)',lineHeight:1.2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{info?.name||c.name}</div>
+              <div style={{fontSize:12,color:'var(--text-muted)',lineHeight:1.3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                {info?.realm||c.realm} <span style={{opacity:0.6}}>·</span> {(info?.region||c.region).toUpperCase()}
+              </div>
               {d && !d.loading && !d.error && (
                 <div className="vault-status-row" style={{marginTop:4}}>
-                  <span className="vault-count">{n}/8</span>
-                  <span style={{fontSize:11}}>this week</span>
+                  <span className="vault-count" style={{color: n===0?'#727272':n<=3?'rgb(28,183,61)':n<=7?'rgb(124,61,255)':'#d97706'}}>{n}/8</span>
+                  <span className="vault-this-week">this week</span>
                 </div>
               )}
               {d?.error && <div style={{fontSize:11,color:'var(--danger)',marginTop:4,lineHeight:1.3,wordBreak:'break-word'}}>{d.error}</div>}
-              <div style={{display:'flex',gap:4,alignItems:'center',marginTop:'auto',paddingTop:6}}>
-                <button className="btn btn-ghost btn-sm" onClick={()=>fetchChar(c)} style={{padding:'2px 6px',fontSize:12}} title="Refresh">↻</button>
-                <button className="btn btn-ghost btn-sm" onClick={()=>removeChar(c.id)} style={{padding:'2px 6px',fontSize:12,color:'var(--danger)'}}>✕</button>
+              <div style={{display:'flex',gap:4,alignItems:'center',marginTop:'auto',paddingTop:4}}>
+                <button className="btn btn-ghost btn-sm" onClick={()=>fetchChar(c)} style={{padding:'1px 5px',fontSize:20,lineHeight:1}} title="Refresh">↻</button>
+                <button className="btn btn-ghost btn-sm" onClick={()=>removeChar(c.id)} style={{padding:'1px 5px',fontSize:20,lineHeight:1,color:'var(--danger)'}}>✕</button>
               </div>
             </div>
             {/* Right: 8 dungeon cards filling remaining width */}
