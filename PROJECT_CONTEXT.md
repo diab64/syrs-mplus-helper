@@ -12,7 +12,7 @@ Two tools in one app, switchable via top-level section tabs:
 
 1. **Score Helper** — A M+ score calculator. Enter a character name, realm, and region. The app fetches their current M+ scores from the Blizzard API, then calculates the most efficient runs to reach a user-specified target score. Two path modes: **Quickest** (fewest runs, highest keys) and **Easiest** (lowest key level that can still reach target).
 
-2. **Vault Tracker** — A group leader tool. Add multiple characters to a list; the app fetches each character's weekly M+ runs from the Raider.IO public API and shows: run count (X/8), Great Vault slot unlock status, and expected item level rewards for each unlocked slot. Character list persists via cookies.
+2. **Vault Tracker** — A group leader tool. Add multiple characters to a list; the app fetches each character's weekly M+ runs from the Raider.IO public API and displays 8 dungeon thumbnail cards per character. Cards at the 1st, 4th, and 8th run positions are highlighted in amber (Great Vault thresholds) and show the unlocked item level reward. Character list persists via cookies.
 
 ---
 
