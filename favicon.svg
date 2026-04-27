@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Warm dark background -->
+  <rect width="32" height="32" rx="6" fill="#1c1410"/>
+
+  <!-- Keystone gem body (hexagonal) -->
+  <polygon points="16,3 29,10.5 29,21.5 16,29 3,21.5 3,10.5"
+    fill="#451a03" stroke="#d97706" stroke-width="1.4"/>
+
+  <!-- Top facet — gives the gem a 3-D cut-stone feel -->
+  <polygon points="16,3 29,10.5 21,13 16,8 11,13 3,10.5"
+    fill="#f59e0b" opacity="0.35"/>
+
+  <!-- Small specular highlight -->
+  <circle cx="21.5" cy="9" r="1.6" fill="#fef3c7" opacity="0.55"/>
+
+  <!-- M+ label -->
+  <text x="16" y="22.5"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-size="12.5"
+    font-weight="900"
+    fill="#fef08a">M+</text>
+</svg>
