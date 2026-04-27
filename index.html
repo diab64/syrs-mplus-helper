@@ -1232,8 +1232,8 @@ function VaultTracker({ realmsData }) {
           </button>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:8,marginTop:8}}>
-          <span style={{fontSize:12,color:'var(--text-muted)',whiteSpace:'nowrap'}}>or raider.io URL</span>
-          <input className="input" placeholder="https://raider.io/characters/us/stormrage/Syrlia"
+          <span style={{fontSize:12,color:'var(--text-muted)',whiteSpace:'nowrap'}}>or paste raider.io link here</span>
+          <input className="input" placeholder="https://raider.io/characters/region/realm/character"
             value={rioUrlInput} onChange={e=>handleRioUrlInput(e.target.value)}
             onKeyDown={e=>e.key==='Enter'&&handleAdd()}
             style={{flex:1,fontSize:13}} />
