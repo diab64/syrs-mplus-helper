@@ -1107,6 +1107,7 @@ function VaultTracker({ realmsData }) {
   const [addError, setAddError] = useState('');
   const [refreshToasts, setRefreshToasts] = useState({});
   const [confirmRemoveId, setConfirmRemoveId] = useState(null);
+  const [rioUrlInput, setRioUrlInput] = useState('');
 
   useEffect(() => {
     const saved = loadVaultCookies();
@@ -1145,6 +1146,21 @@ function VaultTracker({ realmsData }) {
     }
   }
 
+  function handleRioUrlInput(val) {
+    setRioUrlInput(val);
+    const m = val.match(/raider\.io\/characters\/([a-z]{2})\/([^/?#]+)\/([^/?#]+)/i);
+    if (!m) return;
+    const [, region, realmSlug, rawName] = m;
+    const reg = region.toLowerCase();
+    const realmList = realmsData[reg] || [];
+    const realmMatch = realmList.find(r => r.slug === realmSlug.toLowerCase());
+    const realmDisplay = realmMatch ? realmMatch.name : realmSlug;
+    const name = decodeURIComponent(rawName);
+    setInputRegion(reg);
+    setInputRealm(realmDisplay);
+    setInputName(name ? name[0].toUpperCase() + name.slice(1) : name);
+  }
+
   async function handleAdd() {
     const name = inputName.trim(), realm = inputRealm.trim();
     if (!name || !realm) { setAddError('Enter a character name and realm.'); return; }
@@ -1172,6 +1188,7 @@ function VaultTracker({ realmsData }) {
         [nc.id]: { loading: false, error: null, runs, info: { name: data.name, realm: data.realm, region: data.region, class: data.class, thumbnail_url: data.thumbnail_url } }
       }));
       setInputName('');
+      setRioUrlInput('');
     } catch(e) {
       setAddError(e.message || 'Failed to add character.');
     } finally {
@@ -1213,6 +1230,13 @@ function VaultTracker({ realmsData }) {
             style={{height:42,alignSelf:'end',background:'#d97706',color:'#fff',border:'none'}}>
             {addLoading?'...':'+ Add'}
           </button>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8,marginTop:8}}>
+          <span style={{fontSize:12,color:'var(--text-muted)',whiteSpace:'nowrap'}}>or raider.io URL</span>
+          <input className="input" placeholder="https://raider.io/characters/us/stormrage/Syrlia"
+            value={rioUrlInput} onChange={e=>handleRioUrlInput(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&handleAdd()}
+            style={{flex:1,fontSize:13}} />
         </div>
         {addError && <div className="error-msg" style={{marginTop:8}}>{addError}</div>}
       </div>
