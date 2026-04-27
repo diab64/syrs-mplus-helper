@@ -945,6 +945,7 @@ function getVaultIlvl(kl) { return kl >= VAULT_ILVL_MAX_LEVEL ? VAULT_ILVL_MAX :
 
 // Map Raider.IO short_name values to Blizzard zone image slugs for dungeon thumbnails
 const VAULT_DUNGEON_SLUG_MAP = {
+  'AA': 'algethar-academy',
   'ARA': 'ara-kara-city-of-echoes',
   'DAWN': 'the-dawnbreaker', 'DB': 'the-dawnbreaker',
   'PSF': 'priory-of-the-sacred-flame',
@@ -1103,6 +1104,8 @@ function VaultTracker({ realmsData }) {
   const [inputName, setInputName] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState('');
+  const [refreshToasts, setRefreshToasts] = useState({});
+  const [confirmRemoveId, setConfirmRemoveId] = useState(null);
 
   useEffect(() => {
     const saved = loadVaultCookies();
@@ -1221,16 +1224,21 @@ function VaultTracker({ realmsData }) {
         const runs = d?.runs || [];
         const info = d?.info;
         const n = runs.length;
+        const rioUrl = `https://raider.io/characters/${(info?.region||c.region).toLowerCase()}/${(info?.realm||c.realm).toLowerCase().replace(/'/g,'').replace(/\s+/g,'-')}/${encodeURIComponent(info?.name||c.name)}`;
         return (
           <div key={c.id} className="vault-char-card fade-in">
             {/* Left: character info column */}
             <div className="vault-char-info">
               {info?.thumbnail_url && (
-                <img src={info.thumbnail_url} alt=""
-                  style={{width:52,height:52,borderRadius:8,border:'2px solid #78350f80',objectFit:'cover',flexShrink:0}}
-                  onError={e=>{e.target.style.display='none';}} />
+                <a href={rioUrl} target="_blank" rel="noopener noreferrer">
+                  <img src={info.thumbnail_url} alt=""
+                    style={{width:52,height:52,borderRadius:8,border:'2px solid #78350f80',objectFit:'cover',flexShrink:0,display:'block'}}
+                    onError={e=>{e.target.style.display='none';}} />
+                </a>
               )}
-              <div style={{fontWeight:700,fontSize:16,color:info?getClassColor(info.class):'var(--text-primary)',lineHeight:1.2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{info?.name||c.name}</div>
+              <a href={rioUrl} target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
+                <div style={{fontWeight:700,fontSize:16,color:info?getClassColor(info.class):'var(--text-primary)',lineHeight:1.2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{info?.name||c.name}</div>
+              </a>
               <div style={{fontSize:12,color:'var(--text-muted)',lineHeight:1.3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                 {info?.realm||c.realm} <span style={{opacity:0.6}}>·</span> {(info?.region||c.region).toUpperCase()}
               </div>
@@ -1242,8 +1250,19 @@ function VaultTracker({ realmsData }) {
               )}
               {d?.error && <div style={{fontSize:11,color:'var(--danger)',marginTop:4,lineHeight:1.3,wordBreak:'break-word'}}>{d.error}</div>}
               <div style={{display:'flex',gap:4,alignItems:'center',marginTop:'auto',paddingTop:4}}>
-                <button className="btn btn-ghost btn-sm" onClick={()=>fetchChar(c)} style={{padding:'1px 5px',fontSize:20,lineHeight:1}} title="Refresh">↻</button>
-                <button className="btn btn-ghost btn-sm" onClick={()=>removeChar(c.id)} style={{padding:'1px 5px',fontSize:20,lineHeight:1,color:'var(--danger)'}}>✕</button>
+                <div style={{position:'relative',display:'inline-flex'}}>
+                  <button className="btn btn-ghost btn-sm"
+                    onClick={async ()=>{
+                      await fetchChar(c);
+                      setRefreshToasts(prev=>({...prev,[c.id]:true}));
+                      setTimeout(()=>setRefreshToasts(prev=>{const n={...prev};delete n[c.id];return n;}),2000);
+                    }}
+                    style={{padding:'1px 5px',fontSize:20,lineHeight:1}} title="Refresh">↻</button>
+                  {refreshToasts[c.id] && (
+                    <span style={{position:'absolute',bottom:'calc(100% + 4px)',left:'50%',transform:'translateX(-50%)',background:'#1c1a10',color:'#fbbf24',fontSize:11,fontWeight:600,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap',border:'1px solid #d97706',boxShadow:'0 2px 8px rgba(0,0,0,0.5)',pointerEvents:'none',zIndex:10}}>Refreshed</span>
+                  )}
+                </div>
+                <button className="btn btn-ghost btn-sm" onClick={()=>setConfirmRemoveId(c.id)} style={{padding:'1px 5px',fontSize:20,lineHeight:1,color:'var(--danger)'}}>✕</button>
               </div>
             </div>
             {/* Right: 8 dungeon cards filling remaining width */}
@@ -1287,6 +1306,21 @@ function VaultTracker({ realmsData }) {
           </div>
         );
       })}
+      {confirmRemoveId && (()=>{
+        const target = vaultChars.find(c=>c.id===confirmRemoveId);
+        return (
+          <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}} onClick={()=>setConfirmRemoveId(null)}>
+            <div style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:12,padding:24,maxWidth:300,width:'90%',textAlign:'center',boxShadow:'0 8px 32px rgba(0,0,0,0.5)'}} onClick={e=>e.stopPropagation()}>
+              <div style={{fontWeight:700,fontSize:15,marginBottom:8,color:'var(--text-primary)'}}>Stop tracking character?</div>
+              {target && <div style={{fontSize:13,color:'var(--text-muted)',marginBottom:16}}>{target.name} &ndash; {target.realm}</div>}
+              <div style={{display:'flex',gap:8,justifyContent:'center'}}>
+                <button className="btn" onClick={()=>{removeChar(confirmRemoveId);setConfirmRemoveId(null);}} style={{background:'#dc2626',color:'#fff',border:'none',minWidth:80}}>Remove</button>
+                <button className="btn btn-ghost" onClick={()=>setConfirmRemoveId(null)} style={{minWidth:80}}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
