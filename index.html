@@ -1353,7 +1353,8 @@ function VaultTracker({ realmsData }) {
 
 function App() {
   const [theme, setTheme] = useState('dark');
-  const [section, setSection] = useState('score');
+  const [section, setSection] = useState(()=>localStorage.getItem('syrmplus_section')||'score');
+  const switchSection = s => { setSection(s); localStorage.setItem('syrmplus_section', s); };
   const [charName, setCharName] = useState('');
   const [realm, setRealm] = useState('');
   const [region, setRegion] = useState('us');
@@ -1664,8 +1665,8 @@ function App() {
       </header>
       <main className="container">
         <div className="tabs" style={{marginBottom:16}}>
-          <button className={`tab ${section==='score'?'active':''}`} onClick={()=>setSection('score')}>⚡ Score Helper</button>
-          <button className={`tab ${section==='vault'?'active':''}`} onClick={()=>setSection('vault')}>🏆 Vault Tracker</button>
+          <button className={`tab ${section==='score'?'active':''}`} onClick={()=>switchSection('score')}>⚡ Score Helper</button>
+          <button className={`tab ${section==='vault'?'active':''}`} onClick={()=>switchSection('vault')}>🏆 Vault Tracker</button>
         </div>
         {section === 'vault' ? (
           <VaultTracker realmsData={realmsData} />
